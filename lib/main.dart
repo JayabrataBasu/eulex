@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:math_expressions/math_expressions.dart';
+import 'calculator_button.dart';
+import 'calculator_engine.dart';
 
 void main() {
   runApp(const MyApp());
@@ -46,7 +48,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
     '2',
     '3',
     '-',
-    'log',
+    'tan',
     '0',
     '.',
     '=',
@@ -67,17 +69,10 @@ class _CalculatorPageState extends State<CalculatorPage> {
         _expression = '';
         _result = '';
       } else if (value == '=') {
-        try {
-          String exp = _expression.replaceAll('√', 'sqrt');
-          Parser p = Parser();
-          Expression expParsed = p.parse(exp);
-          ContextModel cm = ContextModel();
-          double eval = expParsed.evaluate(EvaluationType.REAL, cm);
-          _result = eval.toString();
+        _result = CalculatorEngine.evaluate(_expression);
+        if (_result != 'Error') {
           _history.insert(0, '$_expression = $_result');
           if (_history.length > 15) _history.removeLast();
-        } catch (e) {
-          _result = 'Error';
         }
       } else if (value == 'M+') {
         if (_result.isNotEmpty) _memory = double.tryParse(_result);
@@ -96,72 +91,126 @@ class _CalculatorPageState extends State<CalculatorPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF181A20),
       appBar: AppBar(
         title: const Text('Eulex Calculator'),
+        backgroundColor: const Color(0xFF22252D),
+        elevation: 0,
       ),
-      body: Column(
-        children: [
-          Expanded(
-            flex: 2,
-            child: Container(
-              width: double.infinity,
-              color: Colors.black12,
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    reverse: true,
+      body: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 380, maxHeight: 650),
+          decoration: BoxDecoration(
+            color: const Color(0xFF22252D),
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.18),
+                blurRadius: 16,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              // Display
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF292D36),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      reverse: true,
+                      child: Text(
+                        _expression,
+                        style: const TextStyle(
+                          fontSize: 28,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      _result,
+                      style: const TextStyle(
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              // Buttons
+              Expanded(
+                child: GridView.builder(
+                  padding: EdgeInsets.zero,
+                  itemCount: _buttons.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 5,
+                    childAspectRatio: 1.1,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                  ),
+                  itemBuilder: (context, index) {
+                    final btn = _buttons[index];
+                    final isOperator = '/x*-+=sincostanlog√'.contains(btn);
+                    return CalculatorButton(
+                      label: btn,
+                      onTap: () => _onButtonPressed(btn),
+                      isOperator: isOperator,
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 8),
+              // History
+              Container(
+                height: 80,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF181A20),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: ListView.builder(
+                  reverse: true,
+                  itemCount: _history.length,
+                  itemBuilder: (context, idx) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
                     child: Text(
-                      _expression,
-                      style: const TextStyle(fontSize: 28),
+                      _history[idx],
+                      style: const TextStyle(fontSize: 16, color: Colors.white54),
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    _result,
-                    style: const TextStyle(
-                        fontSize: 36, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+                  itemCount: _history.length,
+                  itemBuilder: (context, idx) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                    child: Text(
+                      _history[idx],
+                      style: const TextStyle(fontSize: 16, color: Colors.white54),
+                    ),
                   ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
-          Expanded(
-            flex: 3,
-            child: GridView.builder(
-              padding: const EdgeInsets.all(8),
-              itemCount: _buttons.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 5,
-                childAspectRatio: 1.2,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-              ),
-              itemBuilder: (context, index) {
-                final btn = _buttons[index];
-                return ElevatedButton(
-                  onPressed: () => _onButtonPressed(btn),
-                  child: Text(btn, style: const TextStyle(fontSize: 20)),
-                );
-              },
-            ),
-          ),
-          Container(
-            height: 120,
-            color: Colors.grey[200],
-            child: ListView.builder(
-              reverse: true,
-              itemCount: _history.length,
-              itemBuilder: (context, idx) => Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-                child: Text(_history[idx], style: const TextStyle(fontSize: 16)),
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

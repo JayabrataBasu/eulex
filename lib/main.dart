@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+// ignore: unused_import
 import 'package:math_expressions/math_expressions.dart';
 import 'calculator_button.dart';
 import 'calculator_engine.dart';
 import 'theme.dart';
+import 'angle_mode.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,8 +21,8 @@ class _MyAppState extends State<MyApp> {
 
   void _toggleTheme() {
     setState(() {
-      _themeMode = CalculatorThemeMode.values[
-          (_themeMode.index + 1) % CalculatorThemeMode.values.length];
+      _themeMode = CalculatorThemeMode
+          .values[(_themeMode.index + 1) % CalculatorThemeMode.values.length];
     });
   }
 
@@ -57,7 +59,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
   String _expression = '';
   String _result = '';
   List<String> _history = [];
-  double? _memory;
+  AngleMode _angleMode = AngleMode.deg;
 
   final List<String> _buttons = [
     '7',
@@ -86,7 +88,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
     'M+',
     'M-',
     'MR',
-    'MC'
+    'MC',
   ];
 
   void _onButtonPressed(String value) {
@@ -95,25 +97,56 @@ class _CalculatorPageState extends State<CalculatorPage> {
         _expression = '';
         _result = '';
       } else if (value == '=') {
+        CalculatorEngine.setAngleMode(_angleMode);
         _result = CalculatorEngine.evaluate(_expression);
         if (_result != 'Error') {
           _history.insert(0, '$_expression = $_result');
           if (_history.length > 15) _history.removeLast();
         }
       } else if (value == 'M+') {
-        if (_result.isNotEmpty) _memory = double.tryParse(_result);
+        CalculatorEngine.memoryAdd(_result.isNotEmpty ? _result : '0');
       } else if (value == 'M-') {
-        _memory = null;
+        CalculatorEngine.memorySubtract(_result.isNotEmpty ? _result : '0');
       } else if (value == 'MR') {
-        if (_memory != null) _expression += _memory!.toString();
+        _expression += CalculatorEngine.memoryRecall();
+        _result = CalculatorEngine.memoryRecall();
       } else if (value == 'MC') {
-        _memory = null;
+        CalculatorEngine.memoryClear();
       } else if (value == 'sin' || value == 'cos' || value == 'tan') {
         _expression += '$value(';
       } else {
         _expression += value;
       }
     });
+  }
+
+  Widget _buildAngleModeToggle() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: AngleMode.values.map((mode) {
+        final selected = _angleMode == mode;
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: ChoiceChip(
+            label: Text(mode.label),
+            selected: selected,
+            onSelected: (_) {
+              setState(() {
+                _angleMode = mode;
+              });
+            },
+            selectedColor: widget.theme.operatorButtonBackground,
+            backgroundColor: widget.theme.buttonBackground,
+            labelStyle: TextStyle(
+              color: selected
+                  ? widget.theme.operatorTextColor
+                  : widget.theme.buttonTextColor,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        );
+      }).toList(),
+    );
   }
 
   @override
@@ -131,8 +164,8 @@ class _CalculatorPageState extends State<CalculatorPage> {
               widget.themeMode == CalculatorThemeMode.dark
                   ? Icons.light_mode
                   : widget.themeMode == CalculatorThemeMode.light
-                      ? Icons.palette
-                      : Icons.dark_mode,
+                  ? Icons.palette
+                  : Icons.dark_mode,
             ),
             tooltip: 'Switch Theme',
             onPressed: widget.onToggleTheme,
@@ -167,18 +200,39 @@ class _CalculatorPageState extends State<CalculatorPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      reverse: true,
-                      child: Text(
-                        _expression,
-                        style: TextStyle(
-                          fontSize: 28,
-                          color: theme.buttonTextColor,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Expanded(
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            reverse: true,
+                            child: Text(
+                              _expression,
+                              style: TextStyle(
+                                fontSize: 28,
+                                color: theme.buttonTextColor,
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
+                        if (CalculatorEngine.hasMemory())
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Text(
+                              'M',
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: theme.operatorButtonBackground,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4),
+                    _buildAngleModeToggle(),
+                    const SizedBox(height: 4),
                     Text(
                       _result,
                       style: TextStyle(
@@ -231,12 +285,16 @@ class _CalculatorPageState extends State<CalculatorPage> {
                   reverse: true,
                   itemCount: _history.length,
                   itemBuilder: (context, idx) => Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 2,
+                    ),
                     child: Text(
                       _history[idx],
                       style: TextStyle(
-                          fontSize: 16,
-                          color: theme.buttonTextColor.withOpacity(0.7)),
+                        fontSize: 16,
+                        color: theme.buttonTextColor.withOpacity(0.7),
+                      ),
                     ),
                   ),
                 ),

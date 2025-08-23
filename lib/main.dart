@@ -61,34 +61,55 @@ class _CalculatorPageState extends State<CalculatorPage> {
   List<String> _history = [];
   AngleMode _angleMode = AngleMode.deg;
 
-  final List<String> _buttons = [
-    '7',
-    '8',
-    '9',
-    '/',
-    'sin',
-    '4',
-    '5',
-    '6',
-    '*',
-    'cos',
-    '1',
-    '2',
-    '3',
-    '-',
-    'tan',
-    '0',
-    '.',
-    '=',
-    '+',
-    '√',
-    '(',
-    ')',
-    'C',
-    'M+',
-    'M-',
-    'MR',
-    'MC',
+  final List<List<Map<String, dynamic>>> _buttonGrid = [
+    [
+      {'label': 'AC', 'value': 'C', 'type': ButtonType.utility},
+      {'label': '(', 'value': '(', 'type': ButtonType.utility},
+      {'label': ')', 'value': ')', 'type': ButtonType.utility},
+      {'label': '%', 'value': '%', 'type': ButtonType.operator},
+      {'label': '÷', 'value': '÷', 'type': ButtonType.operator},
+      {'label': 'MODE', 'value': 'MODE', 'type': ButtonType.utility},
+    ],
+    [
+      {'label': '7', 'value': '7', 'type': ButtonType.number},
+      {'label': '8', 'value': '8', 'type': ButtonType.number},
+      {'label': '9', 'value': '9', 'type': ButtonType.number},
+      {'label': '×', 'value': '×', 'type': ButtonType.operator},
+      {'label': 'sin', 'value': 'sin', 'type': ButtonType.function},
+      {'label': 'cos', 'value': 'cos', 'type': ButtonType.function},
+    ],
+    [
+      {'label': '4', 'value': '4', 'type': ButtonType.number},
+      {'label': '5', 'value': '5', 'type': ButtonType.number},
+      {'label': '6', 'value': '6', 'type': ButtonType.number},
+      {'label': '−', 'value': '−', 'type': ButtonType.operator},
+      {'label': 'tan', 'value': 'tan', 'type': ButtonType.function},
+      {'label': '√', 'value': '√', 'type': ButtonType.function},
+    ],
+    [
+      {'label': '1', 'value': '1', 'type': ButtonType.number},
+      {'label': '2', 'value': '2', 'type': ButtonType.number},
+      {'label': '3', 'value': '3', 'type': ButtonType.number},
+      {'label': '+', 'value': '+', 'type': ButtonType.operator},
+      {'label': 'x²', 'value': 'x²', 'type': ButtonType.function},
+      {'label': 'xʸ', 'value': 'xʸ', 'type': ButtonType.function},
+    ],
+    [
+      {'label': '0', 'value': '0', 'type': ButtonType.number},
+      {'label': '.', 'value': '.', 'type': ButtonType.number},
+      {'label': 'Ans', 'value': 'Ans', 'type': ButtonType.utility},
+      {'label': '=', 'value': '=', 'type': ButtonType.operator},
+      {'label': 'log', 'value': 'log', 'type': ButtonType.function},
+      {'label': 'ln', 'value': 'ln', 'type': ButtonType.function},
+    ],
+    [
+      {'label': 'MC', 'value': 'MC', 'type': ButtonType.memory},
+      {'label': 'MR', 'value': 'MR', 'type': ButtonType.memory},
+      {'label': 'M+', 'value': 'M+', 'type': ButtonType.memory},
+      {'label': 'M−', 'value': 'M-', 'type': ButtonType.memory},
+      {'label': 'π', 'value': 'π', 'type': ButtonType.function},
+      {'label': 'EXP', 'value': 'EXP', 'type': ButtonType.function},
+    ],
   ];
 
   void _onButtonPressed(String value) {
@@ -103,49 +124,56 @@ class _CalculatorPageState extends State<CalculatorPage> {
           _history.insert(0, '$_expression = $_result');
           if (_history.length > 15) _history.removeLast();
         }
+      } else if (value == 'Ans') {
+        _expression += CalculatorEngine.lastResult;
+      } else if (value == 'π') {
+        _expression += 'π';
+      } else if (value == 'EXP') {
+        _expression += 'EXP';
+      } else if (value == 'x²') {
+        _expression += '^2';
+      } else if (value == 'xʸ') {
+        _expression += '^';
+      } else if (value == '√') {
+        _expression += 'sqrt(';
+      } else if (value == 'log') {
+        _expression += 'log(';
+      } else if (value == 'ln') {
+        _expression += 'ln(';
+      } else if (value == 'sin' || value == 'cos' || value == 'tan') {
+        _expression += '$value(';
+      } else if (value == 'MC') {
+        CalculatorEngine.memoryClear();
+      } else if (value == 'MR') {
+        _expression += CalculatorEngine.memoryRecall();
+        _result = CalculatorEngine.memoryRecall();
       } else if (value == 'M+') {
         CalculatorEngine.memoryAdd(_result.isNotEmpty ? _result : '0');
       } else if (value == 'M-') {
         CalculatorEngine.memorySubtract(_result.isNotEmpty ? _result : '0');
-      } else if (value == 'MR') {
-        _expression += CalculatorEngine.memoryRecall();
-        _result = CalculatorEngine.memoryRecall();
-      } else if (value == 'MC') {
-        CalculatorEngine.memoryClear();
-      } else if (value == 'sin' || value == 'cos' || value == 'tan') {
-        _expression += '$value(';
+      } else if (value == 'MODE') {
+        // Cycle angle mode
+        _angleMode =
+            AngleMode.values[(_angleMode.index + 1) % AngleMode.values.length];
       } else {
         _expression += value;
       }
     });
   }
 
-  Widget _buildAngleModeToggle() {
+  Widget _buildAngleModeIndicator() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
-      children: AngleMode.values.map((mode) {
-        final selected = _angleMode == mode;
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: ChoiceChip(
-            label: Text(mode.label),
-            selected: selected,
-            onSelected: (_) {
-              setState(() {
-                _angleMode = mode;
-              });
-            },
-            selectedColor: widget.theme.operatorButtonBackground,
-            backgroundColor: widget.theme.buttonBackground,
-            labelStyle: TextStyle(
-              color: selected
-                  ? widget.theme.operatorTextColor
-                  : widget.theme.buttonTextColor,
-              fontWeight: FontWeight.bold,
-            ),
+      children: [
+        Text(
+          _angleMode.label,
+          style: TextStyle(
+            fontSize: 16,
+            color: widget.theme.operatorColor,
+            fontWeight: FontWeight.bold,
           ),
-        );
-      }).toList(),
+        ),
+      ],
     );
   }
 
@@ -163,8 +191,6 @@ class _CalculatorPageState extends State<CalculatorPage> {
             icon: Icon(
               widget.themeMode == CalculatorThemeMode.dark
                   ? Icons.light_mode
-                  : widget.themeMode == CalculatorThemeMode.light
-                  ? Icons.palette
                   : Icons.dark_mode,
             ),
             tooltip: 'Switch Theme',
@@ -174,7 +200,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
       ),
       body: Center(
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 380, maxHeight: 650),
+          constraints: const BoxConstraints(maxWidth: 480, maxHeight: 720),
           decoration: BoxDecoration(
             color: theme.themeData.scaffoldBackgroundColor,
             borderRadius: BorderRadius.circular(24),
@@ -211,7 +237,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
                               _expression,
                               style: TextStyle(
                                 fontSize: 28,
-                                color: theme.buttonTextColor,
+                                color: theme.numberTextColor,
                               ),
                             ),
                           ),
@@ -223,7 +249,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
                               'M',
                               style: TextStyle(
                                 fontSize: 20,
-                                color: theme.operatorButtonBackground,
+                                color: theme.memoryColor,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -231,14 +257,14 @@ class _CalculatorPageState extends State<CalculatorPage> {
                       ],
                     ),
                     const SizedBox(height: 4),
-                    _buildAngleModeToggle(),
+                    _buildAngleModeIndicator(),
                     const SizedBox(height: 4),
                     Text(
                       _result,
                       style: TextStyle(
                         fontSize: 36,
                         fontWeight: FontWeight.bold,
-                        color: theme.operatorTextColor,
+                        color: theme.operatorColor,
                       ),
                     ),
                   ],
@@ -247,30 +273,21 @@ class _CalculatorPageState extends State<CalculatorPage> {
               const SizedBox(height: 12),
               // Buttons
               Expanded(
-                child: GridView.builder(
-                  padding: EdgeInsets.zero,
-                  itemCount: _buttons.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 5,
-                    childAspectRatio: 0.95, // Adjusted for better fit
-                    crossAxisSpacing: 8,
-                    mainAxisSpacing: 8,
-                  ),
-                  itemBuilder: (context, index) {
-                    final btn = _buttons[index];
-                    final isOperator = '/x*-+=sincostanlog√'.contains(btn);
-                    return CalculatorButton(
-                      label: btn,
-                      onTap: () => _onButtonPressed(btn),
-                      isOperator: isOperator,
-                      backgroundColor: isOperator
-                          ? widget.theme.operatorButtonBackground
-                          : widget.theme.buttonBackground,
-                      textColor: isOperator
-                          ? widget.theme.operatorTextColor
-                          : widget.theme.buttonTextColor,
-                    );
-                  },
+                child: GridView.count(
+                  crossAxisCount: 6,
+                  mainAxisSpacing: 8,
+                  crossAxisSpacing: 8,
+                  childAspectRatio: 1.1,
+                  children: [
+                    for (final row in _buttonGrid)
+                      for (final btn in row)
+                        CalculatorButton(
+                          label: btn['label'],
+                          onTap: () => _onButtonPressed(btn['value']),
+                          type: btn['type'],
+                          theme: theme,
+                        ),
+                  ],
                 ),
               ),
               const SizedBox(height: 8),
@@ -293,7 +310,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
                       _history[idx],
                       style: TextStyle(
                         fontSize: 16,
-                        color: theme.buttonTextColor.withOpacity(0.7),
+                        color: theme.numberTextColor.withOpacity(0.7),
                       ),
                     ),
                   ),

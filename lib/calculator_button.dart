@@ -1,39 +1,57 @@
 import 'package:flutter/material.dart';
+import 'theme.dart';
 
 class CalculatorButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
-  final bool isOperator;
-  final Color backgroundColor;
-  final Color textColor;
+  final ButtonType type;
+  final CalculatorTheme theme;
 
   const CalculatorButton({
     super.key,
     required this.label,
     required this.onTap,
-    this.isOperator = false,
-    required this.backgroundColor,
-    required this.textColor,
+    required this.type,
+    required this.theme,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isFunction = ['sin', 'cos', 'tan', 'log', '√'].contains(label);
+    Color bg;
+    Color fg;
+    switch (type) {
+      case ButtonType.number:
+        bg = theme.numberColor;
+        fg = theme.numberTextColor;
+        break;
+      case ButtonType.operator:
+        bg = theme.operatorColor;
+        fg = theme.operatorTextColor;
+        break;
+      case ButtonType.function:
+        bg = theme.functionColor;
+        fg = theme.functionTextColor;
+        break;
+      case ButtonType.memory:
+        bg = theme.memoryColor;
+        fg = theme.memoryTextColor;
+        break;
+      case ButtonType.utility:
+        bg = theme.utilityColor;
+        fg = theme.utilityTextColor;
+        break;
+    }
     return ElevatedButton(
       onPressed: onTap,
       style: ElevatedButton.styleFrom(
-        backgroundColor: backgroundColor,
-        foregroundColor: textColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        backgroundColor: bg,
+        foregroundColor: fg,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         elevation: 2,
-        textStyle: TextStyle(fontSize: isFunction ? 16 : 20),
-        padding: isFunction
-            ? const EdgeInsets.symmetric(vertical: 8, horizontal: 2)
-            : null,
+        textStyle: const TextStyle(fontSize: 18),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
       ),
-      child: Text(label, style: TextStyle(color: textColor)),
+      child: Text(label, style: TextStyle(color: fg)),
     );
   }
 }

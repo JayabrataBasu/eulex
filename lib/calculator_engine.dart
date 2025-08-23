@@ -5,6 +5,7 @@ import 'angle_mode.dart';
 class CalculatorEngine {
   static double _memory = 0.0;
   static AngleMode _angleMode = AngleMode.deg;
+  static String _lastResult = '0';
 
   static void setAngleMode(AngleMode mode) {
     _angleMode = mode;
@@ -12,55 +13,55 @@ class CalculatorEngine {
 
   static AngleMode get angleMode => _angleMode;
 
+  static String get lastResult => _lastResult;
+
   static String evaluate(String expression) {
     try {
       String exp = expression
+          .replaceAll('÷', '/')
+          .replaceAll('×', '*')
+          .replaceAll('−', '-')
           .replaceAll('√', 'sqrt')
-          .replaceAll('log', 'log');
+          .replaceAll('π', math.pi.toString())
+          .replaceAll('Ans', _lastResult)
+          .replaceAll('EXP', 'E')
+          .replaceAll('x²', '^2')
+          .replaceAll('xʸ', '^')
+          .replaceAll('log', 'log')
+          .replaceAll('ln', 'ln');
 
-      // Preprocess trigonometric functions to apply angle mode
       exp = _replaceTrigFunctions(exp);
 
       Parser p = Parser();
       ContextModel cm = ContextModel();
       Expression expParsed = p.parse(exp);
       double eval = expParsed.evaluate(EvaluationType.REAL, cm);
-      return eval.toString();
+      _lastResult = eval.toString();
+      return _lastResult;
     } catch (e) {
       return 'Error';
     }
   }
 
   static String _replaceTrigFunctions(String exp) {
-    // Replace sin(x), cos(x), tan(x) with their evaluated values using angle mode
-    exp = exp.replaceAllMapped(
-      RegExp(r'sin\(([^)]+)\)'),
-      (m) {
-        final arg = double.tryParse(_evaluateSimple(m[1]!)) ?? 0.0;
-        final radians = _angleMode.toRadians(arg);
-        return math.sin(radians).toString();
-      },
-    );
-    exp = exp.replaceAllMapped(
-      RegExp(r'cos\(([^)]+)\)'),
-      (m) {
-        final arg = double.tryParse(_evaluateSimple(m[1]!)) ?? 0.0;
-        final radians = _angleMode.toRadians(arg);
-        return math.cos(radians).toString();
-      },
-    );
-    exp = exp.replaceAllMapped(
-      RegExp(r'tan\(([^)]+)\)'),
-      (m) {
-        final arg = double.tryParse(_evaluateSimple(m[1]!)) ?? 0.0;
-        final radians = _angleMode.toRadians(arg);
-        return math.tan(radians).toString();
-      },
-    );
+    exp = exp.replaceAllMapped(RegExp(r'sin\(([^)]+)\)'), (m) {
+      final arg = double.tryParse(_evaluateSimple(m[1]!)) ?? 0.0;
+      final radians = _angleMode.toRadians(arg);
+      return math.sin(radians).toString();
+    });
+    exp = exp.replaceAllMapped(RegExp(r'cos\(([^)]+)\)'), (m) {
+      final arg = double.tryParse(_evaluateSimple(m[1]!)) ?? 0.0;
+      final radians = _angleMode.toRadians(arg);
+      return math.cos(radians).toString();
+    });
+    exp = exp.replaceAllMapped(RegExp(r'tan\(([^)]+)\)'), (m) {
+      final arg = double.tryParse(_evaluateSimple(m[1]!)) ?? 0.0;
+      final radians = _angleMode.toRadians(arg);
+      return math.tan(radians).toString();
+    });
     return exp;
   }
 
-  // Evaluate simple expressions inside trig functions (e.g., "30+60")
   static String _evaluateSimple(String expr) {
     try {
       Parser p = Parser();

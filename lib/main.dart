@@ -206,7 +206,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.18),
+                color: Colors.black.withAlpha((0.18 * 255).toInt()),
                 blurRadius: 16,
                 offset: const Offset(0, 8),
               ),
@@ -310,7 +310,9 @@ class _CalculatorPageState extends State<CalculatorPage> {
                       _history[idx],
                       style: TextStyle(
                         fontSize: 16,
-                        color: theme.numberTextColor.withOpacity(0.7),
+                        color: theme.numberTextColor.withAlpha(
+                          (0.7 * 255).toInt(),
+                        ),
                       ),
                     ),
                   ),

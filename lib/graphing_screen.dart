@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'services/calculator_engine.dart';
 import 'app/theme.dart';
+import 'widgets/viewport_display.dart';
 
 class GraphingScreen extends StatefulWidget {
   final CalculatorTheme theme;
@@ -22,6 +23,14 @@ class _GraphingScreenState extends State<GraphingScreen> {
   final double _step = 0.1;
   String _currentFunction = '';
   bool _isLoading = false;
+
+  // Add pan & zoom state
+  Offset _panOffset = Offset.zero;
+  double _scaleFactor = 1.0;
+
+  // For gesture handling
+  Offset _lastFocalPoint = Offset.zero;
+  double _initialScale = 1.0;
 
   @override
   void initState() {
@@ -153,6 +162,24 @@ class _GraphingScreenState extends State<GraphingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Calculate effective viewport with pan & zoom
+    final double baseRangeX = _maxX - _minX;
+    final double baseRangeY = _maxY - _minY;
+    final double scale = _scaleFactor;
+    final double panX = _panOffset.dx / 200 * baseRangeX; // 200 px = 1x range
+    final double panY = _panOffset.dy / 200 * baseRangeY;
+
+    final double effectiveRangeX = baseRangeX / scale;
+    final double effectiveRangeY = baseRangeY / scale;
+
+    final double centerX = (_minX + _maxX) / 2 - panX;
+    final double centerY = (_minY + _maxY) / 2 + panY;
+
+    final double minX = centerX - effectiveRangeX / 2;
+    final double maxX = centerX + effectiveRangeX / 2;
+    final double minY = centerY - effectiveRangeY / 2;
+    final double maxY = centerY + effectiveRangeY / 2;
+
     return Scaffold(
       backgroundColor: widget.theme.themeData.scaffoldBackgroundColor,
       appBar: AppBar(
@@ -252,89 +279,155 @@ class _GraphingScreenState extends State<GraphingScreen> {
                   color: widget.theme.displayBackground,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: _isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : _plotData.isEmpty
-                    ? Center(
-                        child: Text(
-                          'No data to display\nTry a different function',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: widget.theme.numberTextColor,
-                            fontSize: 16,
-                          ),
-                        ),
-                      )
-                    : LineChart(
-                        LineChartData(
-                          gridData: FlGridData(
-                            show: true,
-                            drawVerticalLine: true,
-                            drawHorizontalLine: true,
-                            getDrawingHorizontalLine: (value) => FlLine(
-                              color: widget.theme.numberTextColor.withAlpha(50),
-                              strokeWidth: 1,
-                            ),
-                            getDrawingVerticalLine: (value) => FlLine(
-                              color: widget.theme.numberTextColor.withAlpha(50),
-                              strokeWidth: 1,
-                            ),
-                          ),
-                          titlesData: FlTitlesData(
-                            bottomTitles: AxisTitles(
-                              sideTitles: SideTitles(
-                                showTitles: true,
-                                getTitlesWidget: (value, meta) => Text(
-                                  value.toStringAsFixed(1),
-                                  style: TextStyle(
-                                    color: widget.theme.numberTextColor,
-                                    fontSize: 12,
+                child: Stack(
+                  children: [
+                    // Chart area (with gestures)
+                    Positioned.fill(
+                      child: _isLoading
+                          ? const Center(child: CircularProgressIndicator())
+                          : _plotData.isEmpty
+                          ? Center(
+                              child: Text(
+                                'No data to display\nTry a different function',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: widget.theme.numberTextColor,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            )
+                          : GestureDetector(
+                              onScaleStart: (details) {
+                                _lastFocalPoint = details.focalPoint;
+                                _initialScale = _scaleFactor;
+                              },
+                              onScaleUpdate: (details) {
+                                setState(() {
+                                  if (details.scale == 1.0) {
+                                    _panOffset +=
+                                        details.focalPoint - _lastFocalPoint;
+                                    _lastFocalPoint = details.focalPoint;
+                                  }
+                                  if (details.scale != 1.0) {
+                                    _scaleFactor =
+                                        (_initialScale * details.scale).clamp(
+                                          0.5,
+                                          10.0,
+                                        );
+                                  }
+                                });
+                              },
+                              onScaleEnd: (details) {
+                                setState(() {
+                                  final double panX =
+                                      _panOffset.dx / 200 * baseRangeX;
+                                  final double panY =
+                                      _panOffset.dy / 200 * baseRangeY;
+                                  _minX -= panX;
+                                  _maxX -= panX;
+                                  _minY += panY;
+                                  _maxY += panY;
+                                  final double centerX = (_minX + _maxX) / 2;
+                                  final double centerY = (_minY + _maxY) / 2;
+                                  final double newRangeX =
+                                      (_maxX - _minX) / _scaleFactor;
+                                  final double newRangeY =
+                                      (_maxY - _minY) / _scaleFactor;
+                                  _minX = centerX - newRangeX / 2;
+                                  _maxX = centerX + newRangeX / 2;
+                                  _minY = centerY - newRangeY / 2;
+                                  _maxY = centerY + newRangeY / 2;
+                                  _panOffset = Offset.zero;
+                                  _scaleFactor = 1.0;
+                                });
+                              },
+                              child: LineChart(
+                                LineChartData(
+                                  gridData: FlGridData(
+                                    show: true,
+                                    drawVerticalLine: true,
+                                    drawHorizontalLine: true,
+                                    getDrawingHorizontalLine: (value) => FlLine(
+                                      color: widget.theme.numberTextColor
+                                          .withAlpha(50),
+                                      strokeWidth: 1,
+                                    ),
+                                    getDrawingVerticalLine: (value) => FlLine(
+                                      color: widget.theme.numberTextColor
+                                          .withAlpha(50),
+                                      strokeWidth: 1,
+                                    ),
                                   ),
+                                  titlesData: FlTitlesData(
+                                    bottomTitles: AxisTitles(
+                                      sideTitles: SideTitles(
+                                        showTitles: true,
+                                        getTitlesWidget: (value, meta) => Text(
+                                          value.toStringAsFixed(1),
+                                          style: TextStyle(
+                                            color: widget.theme.numberTextColor,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    leftTitles: AxisTitles(
+                                      sideTitles: SideTitles(
+                                        showTitles: true,
+                                        getTitlesWidget: (value, meta) => Text(
+                                          value.toStringAsFixed(1),
+                                          style: TextStyle(
+                                            color: widget.theme.numberTextColor,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    topTitles: const AxisTitles(
+                                      sideTitles: SideTitles(showTitles: false),
+                                    ),
+                                    rightTitles: const AxisTitles(
+                                      sideTitles: SideTitles(showTitles: false),
+                                    ),
+                                  ),
+                                  borderData: FlBorderData(
+                                    show: true,
+                                    border: Border.all(
+                                      color: widget.theme.numberTextColor,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  minX: minX,
+                                  maxX: maxX,
+                                  minY: minY,
+                                  maxY: maxY,
+                                  lineBarsData: [
+                                    LineChartBarData(
+                                      spots: _plotData,
+                                      color: widget.theme.functionColor,
+                                      barWidth: 2,
+                                      isStrokeCapRound: true,
+                                      dotData: const FlDotData(show: false),
+                                      belowBarData: BarAreaData(show: false),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
-                            leftTitles: AxisTitles(
-                              sideTitles: SideTitles(
-                                showTitles: true,
-                                getTitlesWidget: (value, meta) => Text(
-                                  value.toStringAsFixed(1),
-                                  style: TextStyle(
-                                    color: widget.theme.numberTextColor,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            topTitles: const AxisTitles(
-                              sideTitles: SideTitles(showTitles: false),
-                            ),
-                            rightTitles: const AxisTitles(
-                              sideTitles: SideTitles(showTitles: false),
-                            ),
-                          ),
-                          borderData: FlBorderData(
-                            show: true,
-                            border: Border.all(
-                              color: widget.theme.numberTextColor,
-                              width: 1,
-                            ),
-                          ),
-                          minX: _minX,
-                          maxX: _maxX,
-                          minY: _minY,
-                          maxY: _maxY,
-                          lineBarsData: [
-                            LineChartBarData(
-                              spots: _plotData,
-                              color: widget.theme.functionColor,
-                              barWidth: 2,
-                              isStrokeCapRound: true,
-                              dotData: const FlDotData(show: false),
-                              belowBarData: BarAreaData(show: false),
-                            ),
-                          ],
-                        ),
+                    ),
+                    // Overlay viewport display in top left
+                    Positioned(
+                      left: 0,
+                      top: 0,
+                      child: ViewportDisplay(
+                        minX: minX,
+                        maxX: maxX,
+                        minY: minY,
+                        maxY: maxY,
                       ),
+                    ),
+                  ],
+                ),
               ),
             ),
             // Current function display

@@ -2,6 +2,20 @@ import 'package:math_expressions/math_expressions.dart';
 import 'dart:math' as math;
 import 'angle_mode.dart';
 
+class SyntaxError implements Exception {
+  final String message;
+  SyntaxError([this.message = "Syntax Error"]);
+  @override
+  String toString() => message;
+}
+
+class MathError implements Exception {
+  final String message;
+  MathError([this.message = "Math Error"]);
+  @override
+  String toString() => message;
+}
+
 class CalculatorEngine {
   static double _memory = 0.0;
   static AngleMode _angleMode = AngleMode.deg;
@@ -32,14 +46,35 @@ class CalculatorEngine {
 
       exp = _replaceTrigFunctions(exp);
 
+      // Add inverse trig and hyperbolic function replacements
+      exp = _replaceInverseTrigFunctions(exp);
+      exp = _replaceHyperbolicFunctions(exp);
+
       Parser p = Parser();
       ContextModel cm = ContextModel();
-      Expression expParsed = p.parse(exp);
-      double eval = expParsed.evaluate(EvaluationType.REAL, cm);
+      Expression expParsed;
+      try {
+        expParsed = p.parse(exp);
+      } catch (e) {
+        throw SyntaxError("Invalid expression syntax.");
+      }
+      double eval;
+      try {
+        eval = expParsed.evaluate(EvaluationType.REAL, cm);
+      } catch (e) {
+        throw MathError("Invalid mathematical operation.");
+      }
+      if (eval.isNaN || eval.isInfinite) {
+        throw MathError("Result is not a valid number.");
+      }
       _lastResult = eval.toString();
       return _lastResult;
+    } on SyntaxError catch (e) {
+      throw e;
+    } on MathError catch (e) {
+      throw e;
     } catch (e) {
-      return 'Error';
+      throw MathError("Unknown error.");
     }
   }
 
@@ -58,6 +93,86 @@ class CalculatorEngine {
       final arg = double.tryParse(_evaluateSimple(m[1]!)) ?? 0.0;
       final radians = _angleMode.toRadians(arg);
       return math.tan(radians).toString();
+    });
+    return exp;
+  }
+
+  static String _replaceInverseTrigFunctions(String exp) {
+    exp = exp.replaceAllMapped(RegExp(r'asin\(([^)]+)\)'), (m) {
+      final arg = double.tryParse(_evaluateSimple(m[1]!)) ?? 0.0;
+      double radians = math.asin(arg);
+      double result;
+      switch (_angleMode) {
+        case AngleMode.deg:
+          result = radians * (180.0 / math.pi);
+          break;
+        case AngleMode.rad:
+          result = radians;
+          break;
+        case AngleMode.grad:
+          result = radians * (200.0 / math.pi);
+          break;
+      }
+      return result.toString();
+    });
+    exp = exp.replaceAllMapped(RegExp(r'acos\(([^)]+)\)'), (m) {
+      final arg = double.tryParse(_evaluateSimple(m[1]!)) ?? 0.0;
+      double radians = math.acos(arg);
+      double result;
+      switch (_angleMode) {
+        case AngleMode.deg:
+          result = radians * (180.0 / math.pi);
+          break;
+        case AngleMode.rad:
+          result = radians;
+          break;
+        case AngleMode.grad:
+          result = radians * (200.0 / math.pi);
+          break;
+      }
+      return result.toString();
+    });
+    exp = exp.replaceAllMapped(RegExp(r'atan\(([^)]+)\)'), (m) {
+      final arg = double.tryParse(_evaluateSimple(m[1]!)) ?? 0.0;
+      double radians = math.atan(arg);
+      double result;
+      switch (_angleMode) {
+        case AngleMode.deg:
+          result = radians * (180.0 / math.pi);
+          break;
+        case AngleMode.rad:
+          result = radians;
+          break;
+        case AngleMode.grad:
+          result = radians * (200.0 / math.pi);
+          break;
+      }
+      return result.toString();
+    });
+    return exp;
+  }
+
+  static String _replaceHyperbolicFunctions(String exp) {
+    exp = exp.replaceAllMapped(RegExp(r'sinh\(([^)]+)\)'), (m) {
+      final arg = double.tryParse(_evaluateSimple(m[1]!)) ?? 0.0;
+      final ex = math.exp(arg);
+      final eNegX = math.exp(-arg);
+      return ((ex - eNegX) / 2.0).toString();
+    });
+    exp = exp.replaceAllMapped(RegExp(r'cosh\(([^)]+)\)'), (m) {
+      final arg = double.tryParse(_evaluateSimple(m[1]!)) ?? 0.0;
+      final ex = math.exp(arg);
+      final eNegX = math.exp(-arg);
+      return ((ex + eNegX) / 2.0).toString();
+    });
+    exp = exp.replaceAllMapped(RegExp(r'tanh\(([^)]+)\)'), (m) {
+      final arg = double.tryParse(_evaluateSimple(m[1]!)) ?? 0.0;
+      final ex = math.exp(arg);
+      final eNegX = math.exp(-arg);
+      final numerator = ex - eNegX;
+      final denominator = ex + eNegX;
+      if (denominator == 0) return '0';
+      return (numerator / denominator).toString();
     });
     return exp;
   }

@@ -60,57 +60,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
   String _result = '';
   List<String> _history = [];
   AngleMode _angleMode = AngleMode.deg;
-
-  final List<List<Map<String, dynamic>>> _buttonGrid = [
-    [
-      {'label': 'AC', 'value': 'C', 'type': ButtonType.utility},
-      {'label': '(', 'value': '(', 'type': ButtonType.utility},
-      {'label': ')', 'value': ')', 'type': ButtonType.utility},
-      {'label': '%', 'value': '%', 'type': ButtonType.operator},
-      {'label': '÷', 'value': '÷', 'type': ButtonType.operator},
-      {'label': 'MODE', 'value': 'MODE', 'type': ButtonType.utility},
-    ],
-    [
-      {'label': '7', 'value': '7', 'type': ButtonType.number},
-      {'label': '8', 'value': '8', 'type': ButtonType.number},
-      {'label': '9', 'value': '9', 'type': ButtonType.number},
-      {'label': '×', 'value': '×', 'type': ButtonType.operator},
-      {'label': 'sin', 'value': 'sin', 'type': ButtonType.function},
-      {'label': 'cos', 'value': 'cos', 'type': ButtonType.function},
-    ],
-    [
-      {'label': '4', 'value': '4', 'type': ButtonType.number},
-      {'label': '5', 'value': '5', 'type': ButtonType.number},
-      {'label': '6', 'value': '6', 'type': ButtonType.number},
-      {'label': '−', 'value': '−', 'type': ButtonType.operator},
-      {'label': 'tan', 'value': 'tan', 'type': ButtonType.function},
-      {'label': '√', 'value': '√', 'type': ButtonType.function},
-    ],
-    [
-      {'label': '1', 'value': '1', 'type': ButtonType.number},
-      {'label': '2', 'value': '2', 'type': ButtonType.number},
-      {'label': '3', 'value': '3', 'type': ButtonType.number},
-      {'label': '+', 'value': '+', 'type': ButtonType.operator},
-      {'label': 'x²', 'value': 'x²', 'type': ButtonType.function},
-      {'label': 'xʸ', 'value': 'xʸ', 'type': ButtonType.function},
-    ],
-    [
-      {'label': '0', 'value': '0', 'type': ButtonType.number},
-      {'label': '.', 'value': '.', 'type': ButtonType.number},
-      {'label': 'Ans', 'value': 'Ans', 'type': ButtonType.utility},
-      {'label': '=', 'value': '=', 'type': ButtonType.operator},
-      {'label': 'log', 'value': 'log', 'type': ButtonType.function},
-      {'label': 'ln', 'value': 'ln', 'type': ButtonType.function},
-    ],
-    [
-      {'label': 'MC', 'value': 'MC', 'type': ButtonType.memory},
-      {'label': 'MR', 'value': 'MR', 'type': ButtonType.memory},
-      {'label': 'M+', 'value': 'M+', 'type': ButtonType.memory},
-      {'label': 'M−', 'value': 'M-', 'type': ButtonType.memory},
-      {'label': 'π', 'value': 'π', 'type': ButtonType.function},
-      {'label': 'EXP', 'value': 'EXP', 'type': ButtonType.function},
-    ],
-  ];
+  bool isShiftActive = false;
 
   @override
   void dispose() {
@@ -138,10 +88,18 @@ class _CalculatorPageState extends State<CalculatorPage> {
         _result = '';
       } else if (value == '=') {
         CalculatorEngine.setAngleMode(_angleMode);
-        _result = CalculatorEngine.evaluate(_expressionController.text);
-        if (_result != 'Error') {
-          _history.insert(0, '${_expressionController.text} = $_result');
-          if (_history.length > 15) _history.removeLast();
+        try {
+          _result = CalculatorEngine.evaluate(_expressionController.text);
+          if (_result != 'Error') {
+            _history.insert(0, '${_expressionController.text} = $_result');
+            if (_history.length > 15) _history.removeLast();
+          }
+        } on SyntaxError catch (e) {
+          _result = e.toString();
+        } on MathError catch (e) {
+          _result = e.toString();
+        } catch (e) {
+          _result = "Unknown error.";
         }
       } else if (value == 'Ans') {
         _insertAtCursor(CalculatorEngine.lastResult);
@@ -159,7 +117,17 @@ class _CalculatorPageState extends State<CalculatorPage> {
         _insertAtCursor('log(');
       } else if (value == 'ln') {
         _insertAtCursor('ln(');
-      } else if (value == 'sin' || value == 'cos' || value == 'tan') {
+      } else if ({
+        'sin',
+        'cos',
+        'tan',
+        'asin',
+        'acos',
+        'atan',
+        'sinh',
+        'cosh',
+        'tanh',
+      }.contains(value)) {
         _insertAtCursor('$value(');
       } else if (value == 'MC') {
         CalculatorEngine.memoryClear();
@@ -174,26 +142,98 @@ class _CalculatorPageState extends State<CalculatorPage> {
       } else if (value == 'MODE') {
         _angleMode =
             AngleMode.values[(_angleMode.index + 1) % AngleMode.values.length];
+      } else if (value == 'SHIFT') {
+        isShiftActive = !isShiftActive;
       } else {
         _insertAtCursor(value);
       }
     });
   }
 
-  Widget _buildAngleModeIndicator() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Text(
-          _angleMode.label,
-          style: TextStyle(
-            fontSize: 16,
-            color: widget.theme.operatorColor,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+  List<List<Map<String, dynamic>>> get _buttonGrid {
+    // Shift toggles between normal and inverse/hyperbolic functions
+    return [
+      [
+        {'label': 'AC', 'value': 'C', 'type': ButtonType.utility},
+        {'label': '(', 'value': '(', 'type': ButtonType.utility},
+        {'label': ')', 'value': ')', 'type': ButtonType.utility},
+        {'label': '%', 'value': '%', 'type': ButtonType.operator},
+        {'label': '÷', 'value': '÷', 'type': ButtonType.operator},
+        {
+          'label': isShiftActive ? 'Shift*' : 'Shift',
+          'value': 'SHIFT',
+          'type': ButtonType.utility,
+        },
       ],
-    );
+      [
+        {'label': '7', 'value': '7', 'type': ButtonType.number},
+        {'label': '8', 'value': '8', 'type': ButtonType.number},
+        {'label': '9', 'value': '9', 'type': ButtonType.number},
+        {'label': '×', 'value': '×', 'type': ButtonType.operator},
+        {
+          'label': isShiftActive ? 'asin' : 'sin',
+          'value': isShiftActive ? 'asin' : 'sin',
+          'type': ButtonType.function,
+        },
+        {
+          'label': isShiftActive ? 'acos' : 'cos',
+          'value': isShiftActive ? 'acos' : 'cos',
+          'type': ButtonType.function,
+        },
+      ],
+      [
+        {'label': '4', 'value': '4', 'type': ButtonType.number},
+        {'label': '5', 'value': '5', 'type': ButtonType.number},
+        {'label': '6', 'value': '6', 'type': ButtonType.number},
+        {'label': '−', 'value': '−', 'type': ButtonType.operator},
+        {
+          'label': isShiftActive ? 'atan' : 'tan',
+          'value': isShiftActive ? 'atan' : 'tan',
+          'type': ButtonType.function,
+        },
+        {
+          'label': isShiftActive ? 'sinh' : '√',
+          'value': isShiftActive ? 'sinh' : '√',
+          'type': ButtonType.function,
+        },
+      ],
+      [
+        {'label': '1', 'value': '1', 'type': ButtonType.number},
+        {'label': '2', 'value': '2', 'type': ButtonType.number},
+        {'label': '3', 'value': '3', 'type': ButtonType.number},
+        {'label': '+', 'value': '+', 'type': ButtonType.operator},
+        {
+          'label': isShiftActive ? 'cosh' : 'x²',
+          'value': isShiftActive ? 'cosh' : 'x²',
+          'type': ButtonType.function,
+        },
+        {
+          'label': isShiftActive ? 'tanh' : 'xʸ',
+          'value': isShiftActive ? 'tanh' : 'xʸ',
+          'type': ButtonType.function,
+        },
+      ],
+      [
+        {'label': '0', 'value': '0', 'type': ButtonType.number},
+        {'label': '.', 'value': '.', 'type': ButtonType.number},
+        {'label': 'Ans', 'value': 'Ans', 'type': ButtonType.utility},
+        {'label': '=', 'value': '=', 'type': ButtonType.operator},
+        {'label': 'log', 'value': 'log', 'type': ButtonType.function},
+        {'label': 'ln', 'value': 'ln', 'type': ButtonType.function},
+      ],
+      [
+        {'label': 'MC', 'value': 'MC', 'type': ButtonType.memory},
+        {'label': 'MR', 'value': 'MR', 'type': ButtonType.memory},
+        {'label': 'M+', 'value': 'M+', 'type': ButtonType.memory},
+        {'label': 'M−', 'value': 'M-', 'type': ButtonType.memory},
+        {'label': 'π', 'value': 'π', 'type': ButtonType.function},
+        {
+          'label': 'Mode\n${_angleMode.label}',
+          'value': 'MODE',
+          'type': ButtonType.utility,
+        },
+      ],
+    ];
   }
 
   @override
@@ -279,7 +319,31 @@ class _CalculatorPageState extends State<CalculatorPage> {
                       ],
                     ),
                     const SizedBox(height: 4),
-                    _buildAngleModeIndicator(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          _angleMode.label,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: widget.theme.operatorColor,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        if (isShiftActive)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 12),
+                            child: Text(
+                              'SHIFT',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.amber,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                     const SizedBox(height: 4),
                     Text(
                       _result,
@@ -308,6 +372,9 @@ class _CalculatorPageState extends State<CalculatorPage> {
                           onTap: () => _onButtonPressed(btn['value']),
                           type: btn['type'],
                           theme: theme,
+                          isShift: btn['value'] == 'SHIFT'
+                              ? isShiftActive
+                              : false,
                         ),
                   ],
                 ),

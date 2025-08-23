@@ -6,6 +6,7 @@ class CalculatorButton extends StatelessWidget {
   final VoidCallback onTap;
   final ButtonType type;
   final CalculatorTheme theme;
+  final bool isShift;
 
   const CalculatorButton({
     super.key,
@@ -13,6 +14,7 @@ class CalculatorButton extends StatelessWidget {
     required this.onTap,
     required this.type,
     required this.theme,
+    this.isShift = false,
   });
 
   @override
@@ -40,6 +42,11 @@ class CalculatorButton extends StatelessWidget {
         bg = theme.utilityColor;
         fg = theme.utilityTextColor;
         break;
+    }
+    // Highlight Shift button if active
+    if (label.toLowerCase().contains('shift') && isShift) {
+      bg = bg.withAlpha(220);
+      fg = Colors.amber;
     }
     return ElevatedButton(
       onPressed: onTap,

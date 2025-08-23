@@ -18,6 +18,7 @@ class CalculatorButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isFunction = ['sin', 'cos', 'tan', 'log', '√'].contains(label);
     return ElevatedButton(
       onPressed: onTap,
       style: ElevatedButton.styleFrom(
@@ -27,7 +28,10 @@ class CalculatorButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
         ),
         elevation: 2,
-        textStyle: const TextStyle(fontSize: 20),
+        textStyle: TextStyle(fontSize: isFunction ? 16 : 20),
+        padding: isFunction
+            ? const EdgeInsets.symmetric(vertical: 8, horizontal: 2)
+            : null,
       ),
       child: Text(label, style: TextStyle(color: textColor)),
     );

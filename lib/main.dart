@@ -108,6 +108,8 @@ class _CalculatorPageState extends State<CalculatorPage> {
         if (_memory != null) _expression += _memory!.toString();
       } else if (value == 'MC') {
         _memory = null;
+      } else if (value == 'sin' || value == 'cos' || value == 'tan') {
+        _expression += '$value(';
       } else {
         _expression += value;
       }
@@ -196,7 +198,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
                   itemCount: _buttons.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 5,
-                    childAspectRatio: 1.1,
+                    childAspectRatio: 0.95, // Adjusted for better fit
                     crossAxisSpacing: 8,
                     mainAxisSpacing: 8,
                   ),
@@ -208,11 +210,11 @@ class _CalculatorPageState extends State<CalculatorPage> {
                       onTap: () => _onButtonPressed(btn),
                       isOperator: isOperator,
                       backgroundColor: isOperator
-                          ? theme.operatorButtonBackground
-                          : theme.buttonBackground,
+                          ? widget.theme.operatorButtonBackground
+                          : widget.theme.buttonBackground,
                       textColor: isOperator
-                          ? theme.operatorTextColor
-                          : theme.buttonTextColor,
+                          ? widget.theme.operatorTextColor
+                          : widget.theme.buttonTextColor,
                     );
                   },
                 ),

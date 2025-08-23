@@ -5,6 +5,7 @@ import '../../services/calculator_engine.dart';
 import '../../services/angle_mode.dart';
 import '../../app/theme.dart';
 import '../../graphing_screen.dart';
+import '../../app/app_state.dart';
 
 class CalculatorScreen extends StatefulWidget {
   final VoidCallback onToggleTheme;
@@ -29,10 +30,20 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
   AngleMode _angleMode = AngleMode.deg;
   bool isShiftActive = false;
 
+  // Add state management for modes
+  ShiftState _shiftState = ShiftState.inactive;
+  OperatingMode _operatingMode = OperatingMode.comp;
+
   @override
   void dispose() {
     _expressionController.dispose();
     super.dispose();
+  }
+
+  void setShiftState(ShiftState newState) {
+    setState(() {
+      _shiftState = newState;
+    });
   }
 
   void _insertAtCursor(String insertText) {
@@ -42,6 +53,19 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     final end = selection.end >= 0 ? selection.end : text.length;
     final newText = text.replaceRange(start, end, insertText);
     final newSelection = start + insertText.length;
+    _expressionController.value = TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: newSelection),
+    );
+  }
+
+  void _insertAtCursorWithSelection(String insertText, int cursorOffset) {
+    final text = _expressionController.text;
+    final selection = _expressionController.selection;
+    final start = selection.start >= 0 ? selection.start : text.length;
+    final end = selection.end >= 0 ? selection.end : text.length;
+    final newText = text.replaceRange(start, end, insertText);
+    final newSelection = start + cursorOffset;
     _expressionController.value = TextEditingValue(
       text: newText,
       selection: TextSelection.collapsed(offset: newSelection),
@@ -111,97 +135,293 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
             AngleMode.values[(_angleMode.index + 1) % AngleMode.values.length];
       } else if (value == 'SHIFT') {
         isShiftActive = !isShiftActive;
+      } else if (value == 'd/dx') {
+        // Insert template: d/dx(|x=)
+        _insertAtCursorWithSelection('d/dx(|x=)', 5);
       } else {
         _insertAtCursor(value);
       }
     });
   }
 
-  List<List<Map<String, dynamic>>> get _buttonGrid {
-    // Shift toggles between normal and inverse/hyperbolic functions
-    return [
-      [
-        {'label': 'AC', 'value': 'C', 'type': ButtonType.utility},
-        {'label': '(', 'value': '(', 'type': ButtonType.utility},
-        {'label': ')', 'value': ')', 'type': ButtonType.utility},
-        {'label': '%', 'value': '%', 'type': ButtonType.operator},
-        {'label': '÷', 'value': '÷', 'type': ButtonType.operator},
-        {
-          'label': isShiftActive ? 'Shift*' : 'Shift',
-          'value': 'SHIFT',
-          'type': ButtonType.utility,
-        },
-      ],
-      [
-        {'label': '7', 'value': '7', 'type': ButtonType.number},
-        {'label': '8', 'value': '8', 'type': ButtonType.number},
-        {'label': '9', 'value': '9', 'type': ButtonType.number},
-        {'label': '×', 'value': '×', 'type': ButtonType.operator},
-        {
-          'label': isShiftActive ? 'asin' : 'sin',
-          'value': isShiftActive ? 'asin' : 'sin',
-          'type': ButtonType.function,
-        },
-        {
-          'label': isShiftActive ? 'acos' : 'cos',
-          'value': isShiftActive ? 'acos' : 'cos',
-          'type': ButtonType.function,
-        },
-      ],
-      [
-        {'label': '4', 'value': '4', 'type': ButtonType.number},
-        {'label': '5', 'value': '5', 'type': ButtonType.number},
-        {'label': '6', 'value': '6', 'type': ButtonType.number},
-        {'label': '−', 'value': '−', 'type': ButtonType.operator},
-        {
-          'label': isShiftActive ? 'atan' : 'tan',
-          'value': isShiftActive ? 'atan' : 'tan',
-          'type': ButtonType.function,
-        },
-        {
-          'label': isShiftActive ? 'sinh' : '√',
-          'value': isShiftActive ? 'sinh' : '√',
-          'type': ButtonType.function,
-        },
-      ],
-      [
-        {'label': '1', 'value': '1', 'type': ButtonType.number},
-        {'label': '2', 'value': '2', 'type': ButtonType.number},
-        {'label': '3', 'value': '3', 'type': ButtonType.number},
-        {'label': '+', 'value': '+', 'type': ButtonType.operator},
-        {
-          'label': isShiftActive ? 'cosh' : 'x²',
-          'value': isShiftActive ? 'cosh' : 'x²',
-          'type': ButtonType.function,
-        },
-        {
-          'label': isShiftActive ? 'tanh' : 'xʸ',
-          'value': isShiftActive ? 'tanh' : 'xʸ',
-          'type': ButtonType.function,
-        },
-      ],
-      [
-        {'label': '0', 'value': '0', 'type': ButtonType.number},
-        {'label': '.', 'value': '.', 'type': ButtonType.number},
-        {'label': 'Ans', 'value': 'Ans', 'type': ButtonType.utility},
-        {'label': '=', 'value': '=', 'type': ButtonType.operator},
-        {'label': 'log', 'value': 'log', 'type': ButtonType.function},
-        {'label': 'ln', 'value': 'ln', 'type': ButtonType.function},
-      ],
-      [
-        {'label': 'MC', 'value': 'MC', 'type': ButtonType.memory},
-        {'label': 'MR', 'value': 'MR', 'type': ButtonType.memory},
-        {'label': 'M+', 'value': 'M+', 'type': ButtonType.memory},
-        {'label': 'M−', 'value': 'M-', 'type': ButtonType.memory},
-        {'label': 'π', 'value': 'π', 'type': ButtonType.function},
-        {
-          'label': 'Mode\n${_angleMode.label}',
-          'value': 'MODE',
-          'type': ButtonType.utility,
-        },
-      ],
-    ];
-  }
+  // Example button definitions for a non-uniform layout.
+  // You can expand this list as needed for your target UI.
+  List<List<Map<String, dynamic>>> get _buttonRows => [
+    [
+      {
+        'label': 'AC',
+        'value': 'C',
+        'type': ButtonType.utility,
+        'secondary': null,
+        'tertiary': null,
+      },
+      {
+        'label': '(',
+        'value': '(',
+        'type': ButtonType.utility,
+        'secondary': null,
+        'tertiary': null,
+      },
+      {
+        'label': ')',
+        'value': ')',
+        'type': ButtonType.utility,
+        'secondary': null,
+        'tertiary': null,
+      },
+      {
+        'label': '%',
+        'value': '%',
+        'type': ButtonType.operator,
+        'secondary': null,
+        'tertiary': null,
+      },
+      {
+        'label': '÷',
+        'value': '÷',
+        'type': ButtonType.operator,
+        'secondary': null,
+        'tertiary': null,
+      },
+      {
+        'label': 'Shift',
+        'value': 'SHIFT',
+        'type': ButtonType.utility,
+        'secondary': null,
+        'tertiary': null,
+      },
+    ],
+    [
+      {
+        'label': '7',
+        'value': '7',
+        'type': ButtonType.number,
+        'secondary': null,
+        'tertiary': null,
+      },
+      {
+        'label': '8',
+        'value': '8',
+        'type': ButtonType.number,
+        'secondary': null,
+        'tertiary': null,
+      },
+      {
+        'label': '9',
+        'value': '9',
+        'type': ButtonType.number,
+        'secondary': null,
+        'tertiary': null,
+      },
+      {
+        'label': '×',
+        'value': '×',
+        'type': ButtonType.operator,
+        'secondary': null,
+        'tertiary': null,
+      },
+      {
+        'label': 'sin',
+        'value': 'sin',
+        'type': ButtonType.function,
+        'secondary': 'sin⁻¹',
+        'tertiary': null,
+      },
+      {
+        'label': 'cos',
+        'value': 'cos',
+        'type': ButtonType.function,
+        'secondary': 'cos⁻¹',
+        'tertiary': null,
+      },
+    ],
+    [
+      {
+        'label': '4',
+        'value': '4',
+        'type': ButtonType.number,
+        'secondary': null,
+        'tertiary': null,
+      },
+      {
+        'label': '5',
+        'value': '5',
+        'type': ButtonType.number,
+        'secondary': null,
+        'tertiary': null,
+      },
+      {
+        'label': '6',
+        'value': '6',
+        'type': ButtonType.number,
+        'secondary': null,
+        'tertiary': null,
+      },
+      {
+        'label': '−',
+        'value': '−',
+        'type': ButtonType.operator,
+        'secondary': null,
+        'tertiary': null,
+      },
+      {
+        'label': 'tan',
+        'value': 'tan',
+        'type': ButtonType.function,
+        'secondary': 'tan⁻¹',
+        'tertiary': null,
+      },
+      {
+        'label': '√',
+        'value': '√',
+        'type': ButtonType.function,
+        'secondary': 'sinh',
+        'tertiary': null,
+      },
+    ],
+    [
+      {
+        'label': '1',
+        'value': '1',
+        'type': ButtonType.number,
+        'secondary': null,
+        'tertiary': null,
+      },
+      {
+        'label': '2',
+        'value': '2',
+        'type': ButtonType.number,
+        'secondary': null,
+        'tertiary': null,
+      },
+      {
+        'label': '3',
+        'value': '3',
+        'type': ButtonType.number,
+        'secondary': null,
+        'tertiary': null,
+      },
+      {
+        'label': '+',
+        'value': '+',
+        'type': ButtonType.operator,
+        'secondary': null,
+        'tertiary': null,
+      },
+      {
+        'label': 'x²',
+        'value': '^2',
+        'type': ButtonType.function,
+        'secondary': 'cosh',
+        'tertiary': null,
+      },
+      {
+        'label': 'xʸ',
+        'value': '^',
+        'type': ButtonType.function,
+        'secondary': 'tanh',
+        'tertiary': null,
+      },
+    ],
+    [
+      {
+        'label': '0',
+        'value': '0',
+        'type': ButtonType.number,
+        'secondary': null,
+        'tertiary': null,
+      },
+      {
+        'label': '.',
+        'value': '.',
+        'type': ButtonType.number,
+        'secondary': null,
+        'tertiary': null,
+      },
+      {
+        'label': 'Ans',
+        'value': 'Ans',
+        'type': ButtonType.utility,
+        'secondary': null,
+        'tertiary': null,
+      },
+      {
+        'label': '=',
+        'value': '=',
+        'type': ButtonType.operator,
+        'secondary': null,
+        'tertiary': null,
+      },
+      {
+        'label': 'log',
+        'value': 'log',
+        'type': ButtonType.function,
+        'secondary': null,
+        'tertiary': null,
+      },
+      {
+        'label': 'ln',
+        'value': 'ln',
+        'type': ButtonType.function,
+        'secondary': null,
+        'tertiary': null,
+      },
+    ],
+    [
+      {
+        'label': 'MC',
+        'value': 'MC',
+        'type': ButtonType.memory,
+        'secondary': null,
+        'tertiary': null,
+      },
+      {
+        'label': 'MR',
+        'value': 'MR',
+        'type': ButtonType.memory,
+        'secondary': null,
+        'tertiary': null,
+      },
+      {
+        'label': 'M+',
+        'value': 'M+',
+        'type': ButtonType.memory,
+        'secondary': null,
+        'tertiary': null,
+      },
+      {
+        'label': 'M−',
+        'value': 'M-',
+        'type': ButtonType.memory,
+        'secondary': null,
+        'tertiary': null,
+      },
+      {
+        'label': 'π',
+        'value': 'π',
+        'type': ButtonType.function,
+        'secondary': null,
+        'tertiary': null,
+      },
+      {
+        'label': 'Mode\n${_angleMode.label}',
+        'value': 'MODE',
+        'type': ButtonType.utility,
+        'secondary': null,
+        'tertiary': null,
+      },
+    ],
+    [
+      {
+        'label': 'd/dx',
+        'value': 'd/dx',
+        'type': ButtonType.function,
+        'secondary': null,
+        'tertiary': null,
+      },
+      // ...add ∫dx or other calculus buttons as needed...
+    ],
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -329,23 +549,30 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
               const SizedBox(height: 12),
               // Buttons
               Expanded(
-                child: GridView.count(
-                  crossAxisCount: 6,
-                  mainAxisSpacing: 8,
-                  crossAxisSpacing: 8,
-                  childAspectRatio: 1.1,
+                child: Column(
                   children: [
-                    for (final row in _buttonGrid)
-                      for (final btn in row)
-                        CalculatorButton(
-                          label: btn['label'],
-                          onTap: () => _onButtonPressed(btn['value']),
-                          type: btn['type'],
-                          theme: theme,
-                          isShift: btn['value'] == 'SHIFT'
-                              ? isShiftActive
-                              : false,
+                    for (final row in _buttonRows)
+                      Expanded(
+                        child: Row(
+                          children: [
+                            for (final btn in row)
+                              Expanded(
+                                child: CalculatorButton(
+                                  label: btn['label'],
+                                  secondaryLabel: btn['secondary'],
+                                  tertiaryLabel: btn['tertiary'],
+                                  onTap: (_) => _onButtonPressed(btn['value']),
+                                  type: btn['type'],
+                                  theme: theme,
+                                  isShift: btn['value'] == 'SHIFT'
+                                      ? isShiftActive
+                                      : false,
+                                  // You can pass shiftState if needed
+                                ),
+                              ),
+                          ],
                         ),
+                      ),
                   ],
                 ),
               ),

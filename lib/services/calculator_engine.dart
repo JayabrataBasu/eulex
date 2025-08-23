@@ -209,4 +209,19 @@ class CalculatorEngine {
   }
 
   static bool hasMemory() => _memory != 0.0;
+
+  static double differentiate(String expression, double point) {
+    // Use central difference: f'(x) ≈ (f(x+h) - f(x-h)) / (2h)
+    const double h = 1e-5;
+    try {
+      String exprPlus = expression.replaceAll('x', '(${point + h})');
+      String exprMinus = expression.replaceAll('x', '(${point - h})');
+      double fPlus = double.tryParse(evaluate(exprPlus)) ?? double.nan;
+      double fMinus = double.tryParse(evaluate(exprMinus)) ?? double.nan;
+      if (fPlus.isNaN || fMinus.isNaN) return double.nan;
+      return (fPlus - fMinus) / (2 * h);
+    } catch (e) {
+      return double.nan;
+    }
+  }
 }

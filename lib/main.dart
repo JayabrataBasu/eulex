@@ -43,7 +43,9 @@ enum ButtonType { number, operator, function, utility, memory }
 
 class CalculatorButton extends StatelessWidget {
   final String label;
-  final VoidCallback onTap;
+  final String? secondaryLabel;
+  final String? tertiaryLabel;
+  final VoidCallback? onTap; // Accepts null for compatibility
   final ButtonType type;
   final CalculatorTheme theme;
   final bool isShift;
@@ -51,7 +53,9 @@ class CalculatorButton extends StatelessWidget {
   const CalculatorButton({
     super.key,
     required this.label,
-    required this.onTap,
+    this.secondaryLabel,
+    this.tertiaryLabel,
+    this.onTap,
     required this.type,
     required this.theme,
     this.isShift = false,
@@ -85,6 +89,9 @@ class CalculatorButton extends StatelessWidget {
         break;
     }
 
+    final shiftColor = Colors.amber;
+    final alphaColor = Colors.redAccent;
+
     return Material(
       color: backgroundColor,
       borderRadius: BorderRadius.circular(8),
@@ -93,16 +100,46 @@ class CalculatorButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         child: Container(
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
-          child: Center(
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: textColor,
+          child: Stack(
+            children: [
+              if (secondaryLabel != null)
+                Positioned(
+                  top: 4,
+                  left: 6,
+                  child: Text(
+                    secondaryLabel!,
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: shiftColor.withOpacity(0.85),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              if (tertiaryLabel != null)
+                Positioned(
+                  top: 4,
+                  right: 6,
+                  child: Text(
+                    tertiaryLabel!,
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: alphaColor.withOpacity(0.85),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              Center(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: textColor,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               ),
-              textAlign: TextAlign.center,
-            ),
+            ],
           ),
         ),
       ),
@@ -442,23 +479,106 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
               const SizedBox(height: 12),
               // Buttons
               Expanded(
-                child: GridView.count(
-                  crossAxisCount: 6,
-                  mainAxisSpacing: 8,
-                  crossAxisSpacing: 8,
-                  childAspectRatio: 1.1,
+                child: Column(
                   children: [
-                    for (final row in _buttonGrid)
-                      for (final btn in row)
-                        CalculatorButton(
-                          label: btn['label'],
-                          onTap: () => _onButtonPressed(btn['value']),
-                          type: btn['type'],
-                          theme: theme,
-                          isShift: btn['value'] == 'SHIFT'
-                              ? isShiftActive
-                              : false,
-                        ),
+                    // ROW 1: Calculus, Powers, etc.
+                    Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'd/dx',
+                              onTap: () => _onButtonPressed('d/dx'),
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '∫dx',
+                              onTap: () => _onButtonPressed('∫dx'),
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'x³',
+                              onTap: () => _onButtonPressed('x³'),
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'x²',
+                              onTap: () => _onButtonPressed('x²'),
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'xʸ',
+                              onTap: () => _onButtonPressed('xʸ'),
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // ROW 2: Core Trig functions
+                    Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'hyp',
+                              onTap: () => _onButtonPressed('hyp'),
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'sin',
+                              onTap: () => _onButtonPressed('sin'),
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'cos',
+                              onTap: () => _onButtonPressed('cos'),
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'tan',
+                              onTap: () => _onButtonPressed('tan'),
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'ln',
+                              onTap: () => _onButtonPressed('ln'),
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // TODO: Continue adding more Expanded > Row > Expanded > CalculatorButton widgets
+                    // to build the rest of the layout from your target UI.
                   ],
                 ),
               ),

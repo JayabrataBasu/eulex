@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import '../app/app_state.dart';
 import '../app/theme.dart';
 
 class CalculatorButton extends StatelessWidget {
   final String label;
-  final VoidCallback onTap;
+  final String? secondaryLabel;
+  final String? tertiaryLabel;
+  final void Function(ShiftState shiftState) onTap;
   final ButtonType type;
   final CalculatorTheme theme;
   final bool isShift;
+  final ShiftState shiftState;
 
   const CalculatorButton({
     super.key,
@@ -14,51 +18,98 @@ class CalculatorButton extends StatelessWidget {
     required this.onTap,
     required this.type,
     required this.theme,
+    this.secondaryLabel,
+    this.tertiaryLabel,
     this.isShift = false,
+    this.shiftState = ShiftState.inactive,
   });
 
   @override
   Widget build(BuildContext context) {
-    Color bg;
-    Color fg;
+    Color backgroundColor;
+    Color textColor;
+
     switch (type) {
       case ButtonType.number:
-        bg = theme.numberColor;
-        fg = theme.numberTextColor;
+        backgroundColor = theme.numberButtonColor;
+        textColor = theme.numberTextColor;
         break;
       case ButtonType.operator:
-        bg = theme.operatorColor;
-        fg = theme.operatorTextColor;
+        backgroundColor = theme.operatorButtonColor;
+        textColor = theme.operatorTextColor;
         break;
       case ButtonType.function:
-        bg = theme.functionColor;
-        fg = theme.functionTextColor;
-        break;
-      case ButtonType.memory:
-        bg = theme.memoryColor;
-        fg = theme.memoryTextColor;
+        backgroundColor = theme.functionButtonColor;
+        textColor = theme.functionTextColor;
         break;
       case ButtonType.utility:
-        bg = theme.utilityColor;
-        fg = theme.utilityTextColor;
+        backgroundColor = isShift ? Colors.amber : theme.utilityButtonColor;
+        textColor = isShift ? Colors.black : theme.utilityTextColor;
+        break;
+      case ButtonType.memory:
+        backgroundColor = theme.memoryButtonColor;
+        textColor = theme.memoryTextColor;
         break;
     }
-    // Highlight Shift button if active
-    if (label.toLowerCase().contains('shift') && isShift) {
-      bg = bg.withAlpha(220);
-      fg = Colors.amber;
-    }
-    return ElevatedButton(
-      onPressed: onTap,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: bg,
-        foregroundColor: fg,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        elevation: 2,
-        textStyle: const TextStyle(fontSize: 18),
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
+
+    // Define colors for shift and alpha labels
+    final shiftColor = Colors.amber;
+    final alphaColor = Colors.redAccent;
+
+    return Material(
+      color: backgroundColor,
+      borderRadius: BorderRadius.circular(8),
+      child: InkWell(
+        onTap: () => onTap(shiftState),
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
+          child: Stack(
+            children: [
+              // Secondary (SHIFT) label - top left
+              if (secondaryLabel != null)
+                Positioned(
+                  top: 4,
+                  left: 6,
+                  child: Text(
+                    secondaryLabel!,
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: shiftColor.withOpacity(0.85),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              // Tertiary (ALPHA) label - top right
+              if (tertiaryLabel != null)
+                Positioned(
+                  top: 4,
+                  right: 6,
+                  child: Text(
+                    tertiaryLabel!,
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: alphaColor.withOpacity(0.85),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              // Main label - center
+              Center(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: textColor,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-      child: Text(label, style: TextStyle(color: fg)),
     );
   }
 }

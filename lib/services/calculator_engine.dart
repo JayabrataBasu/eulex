@@ -65,16 +65,17 @@ class CalculatorEngine {
         throw MathError("Invalid mathematical operation.");
       }
       if (eval.isNaN || eval.isInfinite) {
-        throw MathError("Result is not a valid number.");
+        return double.nan.toString();
       }
       _lastResult = eval.toString();
       return _lastResult;
-    } on SyntaxError catch (e) {
-      throw e;
-    } on MathError catch (e) {
-      throw e;
+    } on SyntaxError catch (_) {
+      return double.nan.toString();
+    } on MathError catch (_) {
+      return double.nan.toString();
     } catch (e) {
-      throw MathError("Unknown error.");
+      // Catch any other math-related errors (e.g., domain errors)
+      return double.nan.toString();
     }
   }
 

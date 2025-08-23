@@ -52,23 +52,32 @@ class _GraphingScreenState extends State<GraphingScreen> {
     double step,
   ) {
     List<FlSpot> spots = [];
+    double? prevY;
+    double jumpThreshold = (_maxY - _minY) * 2;
 
     for (double x = minX; x <= maxX; x += step) {
       try {
-        // Replace 'x' with the current x value
         String modifiedExpression = expression.replaceAll('x', '($x)');
+        String resultStr = CalculatorEngine.evaluate(modifiedExpression);
+        double y = double.tryParse(resultStr) ?? double.nan;
 
-        // Evaluate using our calculator engine
-        String result = CalculatorEngine.evaluate(modifiedExpression);
-        double y = double.tryParse(result) ?? double.nan;
-
-        // Only add valid points
-        if (!y.isNaN && !y.isInfinite) {
-          spots.add(FlSpot(x, y));
+        // Handle undefined/infinite points
+        if (y.isNaN || y.isInfinite) {
+          spots.add(FlSpot.nullSpot);
+          prevY = null;
+          continue;
         }
+
+        // Jump detection for asymptotes/discontinuities
+        if (prevY != null && ((y - prevY).abs() > jumpThreshold)) {
+          spots.add(FlSpot.nullSpot);
+        }
+
+        spots.add(FlSpot(x, y));
+        prevY = y;
       } catch (e) {
-        // Skip invalid points
-        continue;
+        spots.add(FlSpot.nullSpot);
+        prevY = null;
       }
     }
 
@@ -409,7 +418,19 @@ class _GraphingScreenState extends State<GraphingScreen> {
                                       isStrokeCapRound: true,
                                       dotData: const FlDotData(show: false),
                                       belowBarData: BarAreaData(show: false),
+                                      // For future secondary functions, you can use dashArray:
+                                      // dashArray: [8, 4], // Uncomment for dashed line
                                     ),
+                                    // Example for a secondary dashed function:
+                                    // LineChartBarData(
+                                    //   spots: secondaryPlotData,
+                                    //   color: Colors.grey,
+                                    //   barWidth: 2,
+                                    //   isStrokeCapRound: true,
+                                    //   dotData: const FlDotData(show: false),
+                                    //   belowBarData: BarAreaData(show: false),
+                                    //   dashArray: [8, 4],
+                                    // ),
                                   ],
                                 ),
                               ),

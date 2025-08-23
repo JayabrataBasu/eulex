@@ -56,7 +56,7 @@ class CalculatorPage extends StatefulWidget {
 }
 
 class _CalculatorPageState extends State<CalculatorPage> {
-  String _expression = '';
+  final TextEditingController _expressionController = TextEditingController();
   String _result = '';
   List<String> _history = [];
   AngleMode _angleMode = AngleMode.deg;
@@ -112,51 +112,70 @@ class _CalculatorPageState extends State<CalculatorPage> {
     ],
   ];
 
+  @override
+  void dispose() {
+    _expressionController.dispose();
+    super.dispose();
+  }
+
+  void _insertAtCursor(String insertText) {
+    final text = _expressionController.text;
+    final selection = _expressionController.selection;
+    final start = selection.start >= 0 ? selection.start : text.length;
+    final end = selection.end >= 0 ? selection.end : text.length;
+    final newText = text.replaceRange(start, end, insertText);
+    final newSelection = start + insertText.length;
+    _expressionController.value = TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: newSelection),
+    );
+  }
+
   void _onButtonPressed(String value) {
     setState(() {
       if (value == 'C') {
-        _expression = '';
+        _expressionController.clear();
         _result = '';
       } else if (value == '=') {
         CalculatorEngine.setAngleMode(_angleMode);
-        _result = CalculatorEngine.evaluate(_expression);
+        _result = CalculatorEngine.evaluate(_expressionController.text);
         if (_result != 'Error') {
-          _history.insert(0, '$_expression = $_result');
+          _history.insert(0, '${_expressionController.text} = $_result');
           if (_history.length > 15) _history.removeLast();
         }
       } else if (value == 'Ans') {
-        _expression += CalculatorEngine.lastResult;
+        _insertAtCursor(CalculatorEngine.lastResult);
       } else if (value == 'π') {
-        _expression += 'π';
+        _insertAtCursor('π');
       } else if (value == 'EXP') {
-        _expression += 'EXP';
+        _insertAtCursor('EXP');
       } else if (value == 'x²') {
-        _expression += '^2';
+        _insertAtCursor('^2');
       } else if (value == 'xʸ') {
-        _expression += '^';
+        _insertAtCursor('^');
       } else if (value == '√') {
-        _expression += 'sqrt(';
+        _insertAtCursor('sqrt(');
       } else if (value == 'log') {
-        _expression += 'log(';
+        _insertAtCursor('log(');
       } else if (value == 'ln') {
-        _expression += 'ln(';
+        _insertAtCursor('ln(');
       } else if (value == 'sin' || value == 'cos' || value == 'tan') {
-        _expression += '$value(';
+        _insertAtCursor('$value(');
       } else if (value == 'MC') {
         CalculatorEngine.memoryClear();
       } else if (value == 'MR') {
-        _expression += CalculatorEngine.memoryRecall();
-        _result = CalculatorEngine.memoryRecall();
+        final mem = CalculatorEngine.memoryRecall();
+        _insertAtCursor(mem);
+        _result = mem;
       } else if (value == 'M+') {
         CalculatorEngine.memoryAdd(_result.isNotEmpty ? _result : '0');
       } else if (value == 'M-') {
         CalculatorEngine.memorySubtract(_result.isNotEmpty ? _result : '0');
       } else if (value == 'MODE') {
-        // Cycle angle mode
         _angleMode =
             AngleMode.values[(_angleMode.index + 1) % AngleMode.values.length];
       } else {
-        _expression += value;
+        _insertAtCursor(value);
       }
     });
   }
@@ -230,16 +249,19 @@ class _CalculatorPageState extends State<CalculatorPage> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Expanded(
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            reverse: true,
-                            child: Text(
-                              _expression,
-                              style: TextStyle(
-                                fontSize: 28,
-                                color: theme.numberTextColor,
-                              ),
+                          child: TextField(
+                            controller: _expressionController,
+                            style: TextStyle(
+                              fontSize: 28,
+                              color: theme.numberTextColor,
                             ),
+                            textAlign: TextAlign.right,
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              isCollapsed: true,
+                              contentPadding: EdgeInsets.zero,
+                            ),
+                            maxLines: 1,
                           ),
                         ),
                         if (CalculatorEngine.hasMemory())

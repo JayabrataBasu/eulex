@@ -198,20 +198,3 @@ class _CalculatorPageState extends State<CalculatorPage> {
     );
   }
 }
-                  itemCount: _history.length,
-                  itemBuilder: (context, idx) => Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-                    child: Text(
-                      _history[idx],
-                      style: const TextStyle(fontSize: 16, color: Colors.white54),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}

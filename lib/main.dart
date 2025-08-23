@@ -2,27 +2,53 @@ import 'package:flutter/material.dart';
 import 'package:math_expressions/math_expressions.dart';
 import 'calculator_button.dart';
 import 'calculator_engine.dart';
+import 'theme.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  CalculatorThemeMode _themeMode = CalculatorThemeMode.dark;
+
+  void _toggleTheme() {
+    setState(() {
+      _themeMode = CalculatorThemeMode.values[
+          (_themeMode.index + 1) % CalculatorThemeMode.values.length];
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final theme = calculatorThemes[_themeMode]!;
     return MaterialApp(
       title: 'Eulex Calculator',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+      theme: theme.themeData,
+      home: CalculatorPage(
+        onToggleTheme: _toggleTheme,
+        theme: theme,
+        themeMode: _themeMode,
       ),
-      home: const CalculatorPage(),
     );
   }
 }
 
 class CalculatorPage extends StatefulWidget {
-  const CalculatorPage({super.key});
+  final VoidCallback onToggleTheme;
+  final CalculatorTheme theme;
+  final CalculatorThemeMode themeMode;
+  const CalculatorPage({
+    super.key,
+    required this.onToggleTheme,
+    required this.theme,
+    required this.themeMode,
+  });
   @override
   State<CalculatorPage> createState() => _CalculatorPageState();
 }
@@ -90,18 +116,32 @@ class _CalculatorPageState extends State<CalculatorPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = widget.theme;
     return Scaffold(
-      backgroundColor: const Color(0xFF181A20),
+      backgroundColor: theme.themeData.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Eulex Calculator'),
-        backgroundColor: const Color(0xFF22252D),
+        backgroundColor: theme.themeData.appBarTheme.backgroundColor,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: Icon(
+              widget.themeMode == CalculatorThemeMode.dark
+                  ? Icons.light_mode
+                  : widget.themeMode == CalculatorThemeMode.light
+                      ? Icons.palette
+                      : Icons.dark_mode,
+            ),
+            tooltip: 'Switch Theme',
+            onPressed: widget.onToggleTheme,
+          ),
+        ],
       ),
       body: Center(
         child: Container(
           constraints: const BoxConstraints(maxWidth: 380, maxHeight: 650),
           decoration: BoxDecoration(
-            color: const Color(0xFF22252D),
+            color: theme.themeData.scaffoldBackgroundColor,
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
@@ -119,7 +159,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF292D36),
+                  color: theme.displayBackground,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Column(
@@ -130,19 +170,19 @@ class _CalculatorPageState extends State<CalculatorPage> {
                       reverse: true,
                       child: Text(
                         _expression,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 28,
-                          color: Colors.white70,
+                          color: theme.buttonTextColor,
                         ),
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       _result,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 36,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: theme.operatorTextColor,
                       ),
                     ),
                   ],
@@ -167,6 +207,12 @@ class _CalculatorPageState extends State<CalculatorPage> {
                       label: btn,
                       onTap: () => _onButtonPressed(btn),
                       isOperator: isOperator,
+                      backgroundColor: isOperator
+                          ? theme.operatorButtonBackground
+                          : theme.buttonBackground,
+                      textColor: isOperator
+                          ? theme.operatorTextColor
+                          : theme.buttonTextColor,
                     );
                   },
                 ),
@@ -176,7 +222,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
               Container(
                 height: 80,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF181A20),
+                  color: theme.historyBackground,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: ListView.builder(
@@ -186,7 +232,9 @@ class _CalculatorPageState extends State<CalculatorPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
                     child: Text(
                       _history[idx],
-                      style: const TextStyle(fontSize: 16, color: Colors.white54),
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: theme.buttonTextColor.withOpacity(0.7)),
                     ),
                   ),
                 ),

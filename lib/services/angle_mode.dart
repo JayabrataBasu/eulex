@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 enum AngleMode { deg, rad, grad }
 
 extension AngleModeExtension on AngleMode {
@@ -12,15 +14,14 @@ extension AngleModeExtension on AngleMode {
     }
   }
 
-  /// Converts [value] (in this mode) to radians.
   double toRadians(double value) {
     switch (this) {
       case AngleMode.deg:
-        return value * (3.141592653589793 / 180.0);
+        return value * (math.pi / 180.0);
       case AngleMode.rad:
         return value;
       case AngleMode.grad:
-        return value * (3.141592653589793 / 200.0);
+        return value * (math.pi / 200.0);
     }
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'calculator_engine.dart';
-import 'theme.dart';
+import 'services/calculator_engine.dart';
+import 'app/theme.dart';
 
 class GraphingScreen extends StatefulWidget {
   final CalculatorTheme theme;

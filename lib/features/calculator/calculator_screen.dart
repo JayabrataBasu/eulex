@@ -1,113 +1,10 @@
 import 'package:flutter/material.dart';
-import 'app/theme.dart';
-import 'services/calculator_engine.dart';
-import 'services/angle_mode.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  CalculatorThemeMode _themeMode = CalculatorThemeMode.dark;
-
-  void _toggleTheme() {
-    setState(() {
-      _themeMode = CalculatorThemeMode
-          .values[(_themeMode.index + 1) % CalculatorThemeMode.values.length];
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = calculatorThemes[_themeMode]!;
-    return MaterialApp(
-      title: 'Eulex Calculator',
-      theme: theme.themeData,
-      home: CalculatorScreen(
-        onToggleTheme: _toggleTheme,
-        theme: theme,
-        themeMode: _themeMode,
-      ),
-    );
-  }
-}
-
-enum ButtonType { number, operator, function, utility, memory }
-
-class CalculatorButton extends StatelessWidget {
-  final String label;
-  final VoidCallback onTap;
-  final ButtonType type;
-  final CalculatorTheme theme;
-  final bool isShift;
-
-  const CalculatorButton({
-    super.key,
-    required this.label,
-    required this.onTap,
-    required this.type,
-    required this.theme,
-    this.isShift = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    Color backgroundColor;
-    Color textColor;
-
-    switch (type) {
-      case ButtonType.number:
-        backgroundColor = theme.numberButtonColor;
-        textColor = theme.numberTextColor;
-        break;
-      case ButtonType.operator:
-        backgroundColor = theme.operatorButtonColor;
-        textColor = theme.operatorTextColor;
-        break;
-      case ButtonType.function:
-        backgroundColor = theme.functionButtonColor;
-        textColor = theme.functionTextColor;
-        break;
-      case ButtonType.utility:
-        backgroundColor = isShift ? Colors.amber : theme.utilityButtonColor;
-        textColor = isShift ? Colors.black : theme.utilityTextColor;
-        break;
-      case ButtonType.memory:
-        backgroundColor = theme.memoryButtonColor;
-        textColor = theme.memoryTextColor;
-        break;
-    }
-
-    return Material(
-      color: backgroundColor,
-      borderRadius: BorderRadius.circular(8),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
-        child: Container(
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
-          child: Center(
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: textColor,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
+import '../../widgets/calculator_button.dart';
+import '../../services/calculator_engine.dart';
+import '../../services/angle_mode.dart';
+import '../../app/theme.dart';
+import '../../graphing_screen.dart';
 
 class CalculatorScreen extends StatefulWidget {
   final VoidCallback onToggleTheme;
@@ -317,13 +214,16 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
         elevation: 0,
         actions: [
           IconButton(
-            icon: Icon(
-              widget.themeMode == CalculatorThemeMode.dark
-                  ? Icons.light_mode
-                  : Icons.dark_mode,
-            ),
-            tooltip: 'Switch Theme',
-            onPressed: widget.onToggleTheme,
+            icon: const Icon(Icons.show_chart),
+            tooltip: 'Graphing',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => GraphingScreen(theme: theme),
+                ),
+              );
+            },
           ),
         ],
       ),

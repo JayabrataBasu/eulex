@@ -45,6 +45,13 @@ class CalculatorTheme {
     required this.displayBackground,
     required this.historyBackground,
   });
+
+  // Add these getters for compatibility with main.dart and other UI code:
+  Color get numberButtonColor => numberColor;
+  Color get operatorButtonColor => operatorColor;
+  Color get functionButtonColor => functionColor;
+  Color get memoryButtonColor => memoryColor;
+  Color get utilityButtonColor => utilityColor;
 }
 
 final calculatorThemes = {

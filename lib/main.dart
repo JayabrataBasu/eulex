@@ -5,6 +5,7 @@ import 'calculator_button.dart';
 import 'calculator_engine.dart';
 import 'theme.dart';
 import 'angle_mode.dart';
+import 'graphing_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -246,6 +247,18 @@ class _CalculatorPageState extends State<CalculatorPage> {
         backgroundColor: theme.themeData.appBarTheme.backgroundColor,
         elevation: 0,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.show_chart),
+            tooltip: 'Graphing',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => GraphingScreen(theme: theme),
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: Icon(
               widget.themeMode == CalculatorThemeMode.dark

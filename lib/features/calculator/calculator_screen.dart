@@ -144,285 +144,6 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     });
   }
 
-  // Example button definitions for a non-uniform layout.
-  // You can expand this list as needed for your target UI.
-  List<List<Map<String, dynamic>>> get _buttonRows => [
-    [
-      {
-        'label': 'AC',
-        'value': 'C',
-        'type': ButtonType.utility,
-        'secondary': null,
-        'tertiary': null,
-      },
-      {
-        'label': '(',
-        'value': '(',
-        'type': ButtonType.utility,
-        'secondary': null,
-        'tertiary': null,
-      },
-      {
-        'label': ')',
-        'value': ')',
-        'type': ButtonType.utility,
-        'secondary': null,
-        'tertiary': null,
-      },
-      {
-        'label': '%',
-        'value': '%',
-        'type': ButtonType.operator,
-        'secondary': null,
-        'tertiary': null,
-      },
-      {
-        'label': '÷',
-        'value': '÷',
-        'type': ButtonType.operator,
-        'secondary': null,
-        'tertiary': null,
-      },
-      {
-        'label': 'Shift',
-        'value': 'SHIFT',
-        'type': ButtonType.utility,
-        'secondary': null,
-        'tertiary': null,
-      },
-    ],
-    [
-      {
-        'label': '7',
-        'value': '7',
-        'type': ButtonType.number,
-        'secondary': null,
-        'tertiary': null,
-      },
-      {
-        'label': '8',
-        'value': '8',
-        'type': ButtonType.number,
-        'secondary': null,
-        'tertiary': null,
-      },
-      {
-        'label': '9',
-        'value': '9',
-        'type': ButtonType.number,
-        'secondary': null,
-        'tertiary': null,
-      },
-      {
-        'label': '×',
-        'value': '×',
-        'type': ButtonType.operator,
-        'secondary': null,
-        'tertiary': null,
-      },
-      {
-        'label': 'sin',
-        'value': 'sin',
-        'type': ButtonType.function,
-        'secondary': 'sin⁻¹',
-        'tertiary': null,
-      },
-      {
-        'label': 'cos',
-        'value': 'cos',
-        'type': ButtonType.function,
-        'secondary': 'cos⁻¹',
-        'tertiary': null,
-      },
-    ],
-    [
-      {
-        'label': '4',
-        'value': '4',
-        'type': ButtonType.number,
-        'secondary': null,
-        'tertiary': null,
-      },
-      {
-        'label': '5',
-        'value': '5',
-        'type': ButtonType.number,
-        'secondary': null,
-        'tertiary': null,
-      },
-      {
-        'label': '6',
-        'value': '6',
-        'type': ButtonType.number,
-        'secondary': null,
-        'tertiary': null,
-      },
-      {
-        'label': '−',
-        'value': '−',
-        'type': ButtonType.operator,
-        'secondary': null,
-        'tertiary': null,
-      },
-      {
-        'label': 'tan',
-        'value': 'tan',
-        'type': ButtonType.function,
-        'secondary': 'tan⁻¹',
-        'tertiary': null,
-      },
-      {
-        'label': '√',
-        'value': '√',
-        'type': ButtonType.function,
-        'secondary': 'sinh',
-        'tertiary': null,
-      },
-    ],
-    [
-      {
-        'label': '1',
-        'value': '1',
-        'type': ButtonType.number,
-        'secondary': null,
-        'tertiary': null,
-      },
-      {
-        'label': '2',
-        'value': '2',
-        'type': ButtonType.number,
-        'secondary': null,
-        'tertiary': null,
-      },
-      {
-        'label': '3',
-        'value': '3',
-        'type': ButtonType.number,
-        'secondary': null,
-        'tertiary': null,
-      },
-      {
-        'label': '+',
-        'value': '+',
-        'type': ButtonType.operator,
-        'secondary': null,
-        'tertiary': null,
-      },
-      {
-        'label': 'x²',
-        'value': '^2',
-        'type': ButtonType.function,
-        'secondary': 'cosh',
-        'tertiary': null,
-      },
-      {
-        'label': 'xʸ',
-        'value': '^',
-        'type': ButtonType.function,
-        'secondary': 'tanh',
-        'tertiary': null,
-      },
-    ],
-    [
-      {
-        'label': '0',
-        'value': '0',
-        'type': ButtonType.number,
-        'secondary': null,
-        'tertiary': null,
-      },
-      {
-        'label': '.',
-        'value': '.',
-        'type': ButtonType.number,
-        'secondary': null,
-        'tertiary': null,
-      },
-      {
-        'label': 'Ans',
-        'value': 'Ans',
-        'type': ButtonType.utility,
-        'secondary': null,
-        'tertiary': null,
-      },
-      {
-        'label': '=',
-        'value': '=',
-        'type': ButtonType.operator,
-        'secondary': null,
-        'tertiary': null,
-      },
-      {
-        'label': 'log',
-        'value': 'log',
-        'type': ButtonType.function,
-        'secondary': null,
-        'tertiary': null,
-      },
-      {
-        'label': 'ln',
-        'value': 'ln',
-        'type': ButtonType.function,
-        'secondary': null,
-        'tertiary': null,
-      },
-    ],
-    [
-      {
-        'label': 'MC',
-        'value': 'MC',
-        'type': ButtonType.memory,
-        'secondary': null,
-        'tertiary': null,
-      },
-      {
-        'label': 'MR',
-        'value': 'MR',
-        'type': ButtonType.memory,
-        'secondary': null,
-        'tertiary': null,
-      },
-      {
-        'label': 'M+',
-        'value': 'M+',
-        'type': ButtonType.memory,
-        'secondary': null,
-        'tertiary': null,
-      },
-      {
-        'label': 'M−',
-        'value': 'M-',
-        'type': ButtonType.memory,
-        'secondary': null,
-        'tertiary': null,
-      },
-      {
-        'label': 'π',
-        'value': 'π',
-        'type': ButtonType.function,
-        'secondary': null,
-        'tertiary': null,
-      },
-      {
-        'label': 'Mode\n${_angleMode.label}',
-        'value': 'MODE',
-        'type': ButtonType.utility,
-        'secondary': null,
-        'tertiary': null,
-      },
-    ],
-    [
-      {
-        'label': 'd/dx',
-        'value': 'd/dx',
-        'type': ButtonType.function,
-        'secondary': null,
-        'tertiary': null,
-      },
-      // ...add ∫dx or other calculus buttons as needed...
-    ],
-  ];
-
   @override
   Widget build(BuildContext context) {
     final theme = widget.theme;
@@ -551,28 +272,609 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
               Expanded(
                 child: Column(
                   children: [
-                    for (final row in _buttonRows)
-                      Expanded(
-                        child: Row(
-                          children: [
-                            for (final btn in row)
-                              Expanded(
-                                child: CalculatorButton(
-                                  label: btn['label'],
-                                  secondaryLabel: btn['secondary'],
-                                  tertiaryLabel: btn['tertiary'],
-                                  onTap: (_) => _onButtonPressed(btn['value']),
-                                  type: btn['type'],
-                                  theme: theme,
-                                  isShift: btn['value'] == 'SHIFT'
-                                      ? isShiftActive
-                                      : false,
-                                  // You can pass shiftState if needed
-                                ),
-                              ),
-                          ],
-                        ),
+                    // ROW 1: SHIFT, ALPHA, ←, →, MODE, 2nd
+                    Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'SHIFT',
+                              onTap: (_) {},
+                              type: ButtonType.utility,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'ALPHA',
+                              onTap: (_) {},
+                              type: ButtonType.utility,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: Icon(Icons.arrow_back_ios_new),
+                            flex: 2,
+                          ),
+                          Expanded(
+                            child: Icon(Icons.arrow_forward_ios),
+                            flex: 2,
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'MODE',
+                              onTap: (_) {},
+                              type: ButtonType.utility,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '2nd',
+                              onTap: (_) {},
+                              type: ButtonType.utility,
+                              theme: theme,
+                            ),
+                          ),
+                        ],
                       ),
+                    ),
+                    // ROW 2: SOLVE =, d/dx ∫:, ...
+                    Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'SOLVE =',
+                              onTap: (_) {},
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'd/dx ∫:',
+                              onTap: (_) {},
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '',
+                              onTap: (_) {},
+                              type: ButtonType.utility,
+                              theme: theme,
+                            ),
+                          ), // Placeholder
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'x!',
+                              secondaryLabel: 'Π',
+                              onTap: (_) {},
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'x⁻¹',
+                              secondaryLabel: '∫',
+                              onTap: (_) {},
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'Logₓ',
+                              secondaryLabel: '10ˣ',
+                              onTap: (_) {},
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // ROW 3: CALC, ∫dx, mod, ...
+                    Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'CALC',
+                              onTap: (_) {},
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '∫dx',
+                              secondaryLabel: 'Σ',
+                              onTap: (_) {},
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'mod',
+                              secondaryLabel: '(',
+                              onTap: (_) {},
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'x³',
+                              secondaryLabel: '³√',
+                              onTap: (_) {},
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'x²',
+                              secondaryLabel: '√',
+                              onTap: (_) {},
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'x⁻²',
+                              secondaryLabel: 'eˣ',
+                              onTap: (_) {},
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // ROW 4: x÷y, √x, x², xʸ, Log, Ln
+                    Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'x÷y',
+                              secondaryLabel: 'a b/c',
+                              onTap: (_) {},
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '√x',
+                              secondaryLabel: '<',
+                              onTap: (_) {},
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'x²',
+                              secondaryLabel: '>',
+                              onTap: (_) {},
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'xʸ',
+                              secondaryLabel: 'log',
+                              onTap: (_) {},
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'Log',
+                              secondaryLabel: '10ˣ',
+                              onTap: (_) {},
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'Ln',
+                              secondaryLabel: 'eˣ',
+                              onTap: (_) {},
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // ROW 5: Example alpha/numeric/trig row
+                    Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'a',
+                              secondaryLabel: 'FACT',
+                              tertiaryLabel: 'b',
+                              onTap: (_) {},
+                              type: ButtonType.number,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'b',
+                              secondaryLabel: 'FACT',
+                              tertiaryLabel: 'c',
+                              onTap: (_) {},
+                              type: ButtonType.number,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'c',
+                              secondaryLabel: 'FACT',
+                              tertiaryLabel: 'x',
+                              onTap: (_) {},
+                              type: ButtonType.number,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'Sin',
+                              secondaryLabel: 'Sin⁻¹',
+                              tertiaryLabel: 'd',
+                              onTap: (_) {},
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'Cos',
+                              secondaryLabel: 'Cos⁻¹',
+                              tertiaryLabel: 'e',
+                              onTap: (_) {},
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'Tan',
+                              secondaryLabel: 'Tan⁻¹',
+                              tertiaryLabel: 'f',
+                              onTap: (_) {},
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // ROW 6: Utility/angle row
+                    Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '(-)',
+                              secondaryLabel: 'STO',
+                              tertiaryLabel: 'CLRv',
+                              onTap: (_) {},
+                              type: ButtonType.utility,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'o,\'\'\'',
+                              secondaryLabel: 'RCL',
+                              tertiaryLabel: 'I',
+                              onTap: (_) {},
+                              type: ButtonType.utility,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'hyp',
+                              secondaryLabel: 'ENG',
+                              tertiaryLabel: 'Cot⁻¹',
+                              onTap: (_) {},
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '(',
+                              secondaryLabel: ',',
+                              tertiaryLabel: ')',
+                              onTap: (_) {},
+                              type: ButtonType.utility,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: ')',
+                              secondaryLabel: '∫D',
+                              tertiaryLabel: 'x',
+                              onTap: (_) {},
+                              type: ButtonType.utility,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'M-',
+                              secondaryLabel: 'S⇔D',
+                              tertiaryLabel: 'M+',
+                              onTap: (_) {},
+                              type: ButtonType.memory,
+                              theme: theme,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // ROW 7: 7 8 9 × CLR AC
+                    Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '7',
+                              onTap: (_) {},
+                              type: ButtonType.number,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '8',
+                              onTap: (_) {},
+                              type: ButtonType.number,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '9',
+                              onTap: (_) {},
+                              type: ButtonType.number,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '×',
+                              onTap: (_) {},
+                              type: ButtonType.operator,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'CLR',
+                              secondaryLabel: 'CONST',
+                              tertiaryLabel: 'Conv',
+                              onTap: (_) {},
+                              type: ButtonType.utility,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'AC',
+                              onTap: (_) {},
+                              type: ButtonType.utility,
+                              theme: theme,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // ROW 8: 4 5 6 ÷ ← DEL
+                    Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '4',
+                              onTap: (_) {},
+                              type: ButtonType.number,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '5',
+                              onTap: (_) {},
+                              type: ButtonType.number,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '6',
+                              onTap: (_) {},
+                              type: ButtonType.number,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '÷',
+                              onTap: (_) {},
+                              type: ButtonType.operator,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '←',
+                              secondaryLabel: 'SI',
+                              tertiaryLabel: '∞',
+                              onTap: (_) {},
+                              type: ButtonType.utility,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'DEL',
+                              onTap: (_) {},
+                              type: ButtonType.utility,
+                              theme: theme,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // ROW 9: 1 2 3 + COPY Ans
+                    Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '1',
+                              onTap: (_) {},
+                              type: ButtonType.number,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '2',
+                              onTap: (_) {},
+                              type: ButtonType.number,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '3',
+                              onTap: (_) {},
+                              type: ButtonType.number,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '+',
+                              onTap: (_) {},
+                              type: ButtonType.operator,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'COPY',
+                              secondaryLabel: 'Paste',
+                              tertiaryLabel: 'Ran#',
+                              onTap: (_) {},
+                              type: ButtonType.utility,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'Ans',
+                              secondaryLabel: 'RanInt#',
+                              tertiaryLabel: '=',
+                              onTap: (_) {},
+                              type: ButtonType.utility,
+                              theme: theme,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // ROW 10: 0 (wide), . Exp - PreAns =
+                    Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: CalculatorButton(
+                              label: '0',
+                              onTap: (_) {},
+                              type: ButtonType.number,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '.',
+                              onTap: (_) {},
+                              type: ButtonType.number,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'Exp',
+                              secondaryLabel: 'π',
+                              tertiaryLabel: 'e',
+                              onTap: (_) {},
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '-',
+                              onTap: (_) {},
+                              type: ButtonType.operator,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'PreAns',
+                              secondaryLabel: 'History',
+                              onTap: (_) {},
+                              type: ButtonType.utility,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: CalculatorButton(
+                              label: '=',
+                              onTap: (_) {},
+                              type: ButtonType.operator,
+                              theme: theme,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),

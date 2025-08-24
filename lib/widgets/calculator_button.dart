@@ -52,30 +52,45 @@ class CalculatorButton extends StatelessWidget {
         break;
     }
 
-    // Define colors for shift and alpha labels
     final shiftColor = Colors.amber;
     final alphaColor = Colors.redAccent;
 
-    return Material(
-      color: backgroundColor,
-      borderRadius: BorderRadius.circular(8),
-      child: InkWell(
-        onTap: () => onTap(shiftState),
-        borderRadius: BorderRadius.circular(8),
-        child: Container(
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
+    return Padding(
+      padding: const EdgeInsets.all(2.0),
+      child: ElevatedButton(
+        onPressed: () => onTap(shiftState),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: backgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          elevation: 0,
+          padding: EdgeInsets.zero,
+        ),
+        child: SizedBox.expand(
           child: Stack(
+            alignment: Alignment.center,
             children: [
+              // Main label (center)
+              Text(
+                label,
+                style: TextStyle(
+                  color: textColor,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
               // Secondary (SHIFT) label - top left
               if (secondaryLabel != null)
                 Positioned(
-                  top: 4,
-                  left: 6,
+                  top: 8,
+                  left: 8,
                   child: Text(
                     secondaryLabel!,
                     style: TextStyle(
-                      fontSize: 10,
-                      color: shiftColor.withOpacity(0.85),
+                      color: shiftColor,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -83,29 +98,17 @@ class CalculatorButton extends StatelessWidget {
               // Tertiary (ALPHA) label - top right
               if (tertiaryLabel != null)
                 Positioned(
-                  top: 4,
-                  right: 6,
+                  top: 8,
+                  right: 8,
                   child: Text(
                     tertiaryLabel!,
                     style: TextStyle(
-                      fontSize: 10,
-                      color: alphaColor.withOpacity(0.85),
+                      color: alphaColor,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-              // Main label - center
-              Center(
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: textColor,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
             ],
           ),
         ),

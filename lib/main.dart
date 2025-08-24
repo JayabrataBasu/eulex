@@ -477,18 +477,108 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              // Buttons
+              // Buttons - Replace GridView with Column & Row structure
               Expanded(
                 child: Column(
                   children: [
-                    // ROW 1: Calculus, Powers, etc.
+                    // ROW 1: SHIFT, ALPHA, ARROWS, MODE, 2nd
+                    Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: CalculatorButton(
+                              label: 'SHIFT',
+                              onTap: () => _onButtonPressed('SHIFT'),
+                              type: ButtonType.utility,
+                              theme: theme,
+                              isShift: isShiftActive,
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: CalculatorButton(
+                              label: 'ALPHA',
+                              onTap: () => _onButtonPressed('ALPHA'),
+                              type: ButtonType.utility,
+                              theme: theme,
+                            ),
+                          ),
+                          // Arrow buttons using IconButtons
+                          Expanded(
+                            flex: 1,
+                            child: Container(
+                              margin: const EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                color: theme.utilityButtonColor,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: IconButton(
+                                icon: Icon(
+                                  Icons.arrow_back_ios_new,
+                                  color: theme.utilityTextColor,
+                                ),
+                                onPressed: () => _onButtonPressed('LEFT'),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Container(
+                              margin: const EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                color: theme.utilityButtonColor,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: IconButton(
+                                icon: Icon(
+                                  Icons.arrow_forward_ios,
+                                  color: theme.utilityTextColor,
+                                ),
+                                onPressed: () => _onButtonPressed('RIGHT'),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: CalculatorButton(
+                              label: 'MODE',
+                              onTap: () => _onButtonPressed('MODE'),
+                              type: ButtonType.utility,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: CalculatorButton(
+                              label: '2nd',
+                              onTap: () => _onButtonPressed('2nd'),
+                              type: ButtonType.utility,
+                              theme: theme,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // ROW 2: SOLVE, CALCULUS, etc.
                     Expanded(
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Expanded(
                             child: CalculatorButton(
+                              label: 'SOLVE',
+                              secondaryLabel: '=',
+                              onTap: () => _onButtonPressed('SOLVE'),
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
                               label: 'd/dx',
+                              secondaryLabel: '∫',
                               onTap: () => _onButtonPressed('d/dx'),
                               type: ButtonType.function,
                               theme: theme,
@@ -496,32 +586,33 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                           ),
                           Expanded(
                             child: CalculatorButton(
-                              label: '∫dx',
-                              onTap: () => _onButtonPressed('∫dx'),
+                              label: 'CALC',
+                              onTap: () => _onButtonPressed('CALC'),
                               type: ButtonType.function,
                               theme: theme,
                             ),
                           ),
                           Expanded(
                             child: CalculatorButton(
-                              label: 'x³',
-                              onTap: () => _onButtonPressed('x³'),
+                              label: 'x!',
+                              secondaryLabel: 'Σ',
+                              onTap: () => _onButtonPressed('x!'),
                               type: ButtonType.function,
                               theme: theme,
                             ),
                           ),
                           Expanded(
                             child: CalculatorButton(
-                              label: 'x²',
-                              onTap: () => _onButtonPressed('x²'),
+                              label: 'x⁻¹',
+                              onTap: () => _onButtonPressed('x⁻¹'),
                               type: ButtonType.function,
                               theme: theme,
                             ),
                           ),
                           Expanded(
                             child: CalculatorButton(
-                              label: 'xʸ',
-                              onTap: () => _onButtonPressed('xʸ'),
+                              label: 'Logₓ y',
+                              onTap: () => _onButtonPressed('Logₓ y'),
                               type: ButtonType.function,
                               theme: theme,
                             ),
@@ -529,23 +620,18 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                         ],
                       ),
                     ),
-                    // ROW 2: Core Trig functions
+                    // ROW 3: Advanced functions
                     Expanded(
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Expanded(
                             child: CalculatorButton(
-                              label: 'hyp',
-                              onTap: () => _onButtonPressed('hyp'),
-                              type: ButtonType.function,
-                              theme: theme,
-                            ),
-                          ),
-                          Expanded(
-                            child: CalculatorButton(
                               label: 'sin',
-                              onTap: () => _onButtonPressed('sin'),
+                              secondaryLabel: 'sin⁻¹',
+                              onTap: () => _onButtonPressed(
+                                isShiftActive ? 'asin' : 'sin',
+                              ),
                               type: ButtonType.function,
                               theme: theme,
                             ),
@@ -553,7 +639,10 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                           Expanded(
                             child: CalculatorButton(
                               label: 'cos',
-                              onTap: () => _onButtonPressed('cos'),
+                              secondaryLabel: 'cos⁻¹',
+                              onTap: () => _onButtonPressed(
+                                isShiftActive ? 'acos' : 'cos',
+                              ),
                               type: ButtonType.function,
                               theme: theme,
                             ),
@@ -561,7 +650,10 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                           Expanded(
                             child: CalculatorButton(
                               label: 'tan',
-                              onTap: () => _onButtonPressed('tan'),
+                              secondaryLabel: 'tan⁻¹',
+                              onTap: () => _onButtonPressed(
+                                isShiftActive ? 'atan' : 'tan',
+                              ),
                               type: ButtonType.function,
                               theme: theme,
                             ),
@@ -569,7 +661,27 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                           Expanded(
                             child: CalculatorButton(
                               label: 'ln',
+                              secondaryLabel: 'eˣ',
                               onTap: () => _onButtonPressed('ln'),
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'log',
+                              secondaryLabel: '10ˣ',
+                              onTap: () => _onButtonPressed('log'),
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '√',
+                              secondaryLabel: 'x²',
+                              onTap: () =>
+                                  _onButtonPressed(isShiftActive ? 'x²' : '√'),
                               type: ButtonType.function,
                               theme: theme,
                             ),
@@ -577,8 +689,217 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                         ],
                       ),
                     ),
-                    // TODO: Continue adding more Expanded > Row > Expanded > CalculatorButton widgets
-                    // to build the rest of the layout from your target UI.
+                    // ROW 4: Numbers and operators (7,8,9,÷)
+                    Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '7',
+                              onTap: () => _onButtonPressed('7'),
+                              type: ButtonType.number,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '8',
+                              onTap: () => _onButtonPressed('8'),
+                              type: ButtonType.number,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '9',
+                              onTap: () => _onButtonPressed('9'),
+                              type: ButtonType.number,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '÷',
+                              onTap: () => _onButtonPressed('÷'),
+                              type: ButtonType.operator,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '(',
+                              onTap: () => _onButtonPressed('('),
+                              type: ButtonType.utility,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: ')',
+                              onTap: () => _onButtonPressed(')'),
+                              type: ButtonType.utility,
+                              theme: theme,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // ROW 5: Numbers and operators (4,5,6,×)
+                    Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '4',
+                              onTap: () => _onButtonPressed('4'),
+                              type: ButtonType.number,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '5',
+                              onTap: () => _onButtonPressed('5'),
+                              type: ButtonType.number,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '6',
+                              onTap: () => _onButtonPressed('6'),
+                              type: ButtonType.number,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '×',
+                              onTap: () => _onButtonPressed('×'),
+                              type: ButtonType.operator,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'xʸ',
+                              secondaryLabel: 'ʸ√x',
+                              onTap: () => _onButtonPressed('xʸ'),
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'π',
+                              onTap: () => _onButtonPressed('π'),
+                              type: ButtonType.function,
+                              theme: theme,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // ROW 6: Numbers and operators (1,2,3,-)
+                    Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '1',
+                              onTap: () => _onButtonPressed('1'),
+                              type: ButtonType.number,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '2',
+                              onTap: () => _onButtonPressed('2'),
+                              type: ButtonType.number,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '3',
+                              onTap: () => _onButtonPressed('3'),
+                              type: ButtonType.number,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '−',
+                              onTap: () => _onButtonPressed('−'),
+                              type: ButtonType.operator,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'AC',
+                              onTap: () => _onButtonPressed('C'),
+                              type: ButtonType.utility,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: 'DEL',
+                              onTap: () => _onButtonPressed('DEL'),
+                              type: ButtonType.utility,
+                              theme: theme,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // ROW 7: Bottom row (0, ., +, =)
+                    Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: CalculatorButton(
+                              label: '0',
+                              onTap: () => _onButtonPressed('0'),
+                              type: ButtonType.number,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '.',
+                              onTap: () => _onButtonPressed('.'),
+                              type: ButtonType.number,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            child: CalculatorButton(
+                              label: '+',
+                              onTap: () => _onButtonPressed('+'),
+                              type: ButtonType.operator,
+                              theme: theme,
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: CalculatorButton(
+                              label: '=',
+                              onTap: () => _onButtonPressed('='),
+                              type: ButtonType.operator,
+                              theme: theme,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),

@@ -1,335 +1,101 @@
+// lib/app/theme.dart
+
 import 'package:flutter/material.dart';
 
-enum CalculatorThemeMode {
-  dark,
-  light,
-  vibrant,
-  neoMint,
-  cyberpunk,
-  solarSunset,
-  royalElegance,
-  materialYou,
-  matrixHacker,
-  pastelCandy,
-}
-
-enum ButtonType { number, operator, function, memory, utility }
-
 class CalculatorTheme {
-  final ThemeData themeData;
-  final Color numberColor;
-  final Color operatorColor;
-  final Color functionColor;
-  final Color memoryColor;
-  final Color utilityColor;
-  final Color numberTextColor;
-  final Color operatorTextColor;
-  final Color functionTextColor;
-  final Color memoryTextColor;
-  final Color utilityTextColor;
+  final String name;
+  final Color background;
   final Color displayBackground;
-  final Color historyBackground;
-
+  final Color functionButton;
+  final Color operatorButton;
+  final Color controlButton;
+  final Color shiftButton;
+  final Color alphaButton;
+  final Color shiftLabelText;
+  final Color alphaLabelText;
+  final Brightness brightness;
   const CalculatorTheme({
-    required this.themeData,
-    required this.numberColor,
-    required this.operatorColor,
-    required this.functionColor,
-    required this.memoryColor,
-    required this.utilityColor,
-    required this.numberTextColor,
-    required this.operatorTextColor,
-    required this.functionTextColor,
-    required this.memoryTextColor,
-    required this.utilityTextColor,
+    required this.name,
+    required this.background,
     required this.displayBackground,
-    required this.historyBackground,
+    required this.functionButton,
+    required this.operatorButton,
+    required this.controlButton,
+    required this.shiftButton,
+    required this.alphaButton,
+    required this.shiftLabelText,
+    required this.alphaLabelText,
+    required this.brightness,
   });
-
-  // Add these getters for compatibility with main.dart and other UI code:
-  Color get numberButtonColor => numberColor;
-  Color get operatorButtonColor => operatorColor;
-  Color get functionButtonColor => functionColor;
-  Color get memoryButtonColor => memoryColor;
-  Color get utilityButtonColor => utilityColor;
 }
 
-final calculatorThemes = {
-  CalculatorThemeMode.dark: CalculatorTheme(
-    themeData: ThemeData(
-      brightness: Brightness.dark,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: Color(0xFF6C61F6),
-        brightness: Brightness.dark,
-      ),
-      scaffoldBackgroundColor: Color(0xFF181A20),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFF22252D),
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
-    ),
-    numberColor: Color(0xFF292D36),
-    operatorColor: Color(0xFF6C61F6),
-    functionColor: Color(0xFF00C49A),
-    memoryColor: Color(0xFFFFD166),
-    utilityColor: Color(0xFF22252D),
-    numberTextColor: Colors.white,
-    operatorTextColor: Colors.white,
-    functionTextColor: Colors.white,
-    memoryTextColor: Colors.black,
-    utilityTextColor: Colors.white,
-    displayBackground: Color(0xFF292D36),
-    historyBackground: Color(0xFF181A20),
-  ),
-  CalculatorThemeMode.light: CalculatorTheme(
-    themeData: ThemeData(
-      brightness: Brightness.light,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: Color(0xFF4CAF50),
-        brightness: Brightness.light,
-      ),
-      scaffoldBackgroundColor: Colors.white,
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFFEDEDED),
-        foregroundColor: Colors.black,
-        elevation: 0,
-      ),
-    ),
-    numberColor: Colors.white,
-    operatorColor: Color(0xFF4CAF50),
-    functionColor: Color(0xFF1976D2),
-    memoryColor: Color(0xFFFFD166),
-    utilityColor: Color(0xFFE0E0E0),
-    numberTextColor: Colors.black,
-    operatorTextColor: Colors.white,
-    functionTextColor: Colors.white,
-    memoryTextColor: Colors.black,
-    utilityTextColor: Colors.black,
-    displayBackground: Color(0xFFF5F5F5),
-    historyBackground: Color(0xFFF0F0F0),
-  ),
-  CalculatorThemeMode.vibrant: CalculatorTheme(
-    themeData: ThemeData(
-      brightness: Brightness.light,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: Color(0xFF1976D2),
-        brightness: Brightness.light,
-      ),
-      scaffoldBackgroundColor: const Color(0xFFFDF6F0),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFF1976D2),
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
-    ),
-    numberColor: Colors.white,
-    operatorColor: Color(0xFF4CAF50),
-    functionColor: Color(0xFF1976D2),
-    memoryColor: Color(0xFFFFD166),
-    utilityColor: Color(0xFFE0E0E0),
-    numberTextColor: Colors.black,
-    operatorTextColor: Colors.white,
-    functionTextColor: Colors.white,
-    memoryTextColor: Colors.black,
-    utilityTextColor: Colors.black,
-    displayBackground: const Color(0xFFB3E5FC),
-    historyBackground: const Color(0xFFFFF8E1),
-  ),
-  // 1. Neo-Mint Minimal
-  CalculatorThemeMode.neoMint: CalculatorTheme(
-    themeData: ThemeData(
-      brightness: Brightness.light,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: Color(0xFF00C49A),
-        brightness: Brightness.light,
-      ),
-      scaffoldBackgroundColor: Color(0xFFE8F9F7),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFF00C49A),
-        foregroundColor: Color(0xFF222831),
-        elevation: 0,
-      ),
-    ),
-    numberColor: Colors.white,
-    operatorColor: Color(0xFF00C49A),
-    functionColor: Color(0xFF1976D2),
-    memoryColor: Color(0xFFFFD166),
-    utilityColor: Color(0xFFE0E0E0),
-    numberTextColor: Colors.black,
-    operatorTextColor: Colors.white,
-    functionTextColor: Colors.white,
-    memoryTextColor: Colors.black,
-    utilityTextColor: Colors.black,
-    displayBackground: const Color(0xFFF7F7F7),
-    historyBackground: const Color(0xFFE8F9F7),
-  ),
-  // 2. Cyberpunk Glow
-  CalculatorThemeMode.cyberpunk: CalculatorTheme(
-    themeData: ThemeData(
-      brightness: Brightness.dark,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: Color(0xFFFF007F),
-        brightness: Brightness.dark,
-      ),
-      scaffoldBackgroundColor: Color(0xFF1A1A2E),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFF0D0D0D),
-        foregroundColor: Color(0xFF00FFE0),
-        elevation: 0,
-      ),
-    ),
-    numberColor: Color(0xFF0D0D0D),
-    operatorColor: Color(0xFFFF007F),
-    functionColor: Color(0xFF00C49A),
-    memoryColor: Color(0xFFFFD166),
-    utilityColor: Color(0xFF1A1A2E),
-    numberTextColor: Colors.white,
-    operatorTextColor: Color(0xFF00FFE0),
-    functionTextColor: Color(0xFF00FFE0),
-    memoryTextColor: Colors.black,
-    utilityTextColor: Colors.white,
-    displayBackground: const Color(0xFF0D0D0D),
-    historyBackground: const Color(0xFF1A1A2E),
-  ),
-  // 3. Solar Sunset
-  CalculatorThemeMode.solarSunset: CalculatorTheme(
-    themeData: ThemeData(
-      brightness: Brightness.light,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: Color(0xFFFF6F61),
-        brightness: Brightness.light,
-      ),
-      scaffoldBackgroundColor: Color(0xFFF9F9F9),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFFFFD166),
-        foregroundColor: Color(0xFF06D6A0),
-        elevation: 0,
-      ),
-    ),
-    numberColor: Colors.white,
-    operatorColor: Color(0xFFFF6F61),
-    functionColor: Color(0xFF1976D2),
-    memoryColor: Color(0xFFFFD166),
-    utilityColor: Color(0xFFE0E0E0),
-    numberTextColor: Colors.black,
-    operatorTextColor: Colors.white,
-    functionTextColor: Colors.white,
-    memoryTextColor: Colors.black,
-    utilityTextColor: Colors.black,
-    displayBackground: const Color(0xFFFFD166),
-    historyBackground: const Color(0xFFF9F9F9),
-  ),
-  // 4. Royal Elegance
-  CalculatorThemeMode.royalElegance: CalculatorTheme(
-    themeData: ThemeData(
-      brightness: Brightness.light,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: Color(0xFF2E294E),
-        brightness: Brightness.light,
-      ),
-      scaffoldBackgroundColor: Color(0xFFF4F1DE),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFF2E294E),
-        foregroundColor: Color(0xFFFF9F1C),
-        elevation: 0,
-      ),
-    ),
-    numberColor: Colors.white,
-    operatorColor: Color(0xFFE71D36),
-    functionColor: Color(0xFF1976D2),
-    memoryColor: Color(0xFFFFD166),
-    utilityColor: Color(0xFFF4F1DE),
-    numberTextColor: Colors.black,
-    operatorTextColor: Colors.white,
-    functionTextColor: Colors.white,
-    memoryTextColor: Colors.black,
-    utilityTextColor: Colors.black,
-    displayBackground: const Color(0xFFF4F1DE),
-    historyBackground: const Color(0xFFF4F1DE),
-  ),
-  // 5. Material You Inspired
-  CalculatorThemeMode.materialYou: CalculatorTheme(
-    themeData: ThemeData(
-      brightness: Brightness.light,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: Color(0xFF6750A4),
-        brightness: Brightness.light,
-      ),
-      scaffoldBackgroundColor: Color(0xFFF5F0FF),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFF6750A4),
-        foregroundColor: Color(0xFFD0BCFF),
-        elevation: 0,
-      ),
-    ),
-    numberColor: Colors.white,
-    operatorColor: Color(0xFF7D5260),
-    functionColor: Color(0xFF1976D2),
-    memoryColor: Color(0xFFFFD166),
-    utilityColor: Color(0xFFF5F0FF),
-    numberTextColor: Colors.black,
-    operatorTextColor: Colors.white,
-    functionTextColor: Colors.white,
-    memoryTextColor: Colors.black,
-    utilityTextColor: Colors.black,
-    displayBackground: const Color(0xFFD0BCFF),
-    historyBackground: const Color(0xFFF5F0FF),
-  ),
-  // 6. Matrix Hacker
-  CalculatorThemeMode.matrixHacker: CalculatorTheme(
-    themeData: ThemeData(
-      brightness: Brightness.dark,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: Color(0xFF00FF41),
-        brightness: Brightness.dark,
-      ),
-      scaffoldBackgroundColor: Color(0xFF121212),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFF1E1E1E),
-        foregroundColor: Color(0xFF00FF41),
-        elevation: 0,
-      ),
-    ),
-    numberColor: Color(0xFF1E1E1E),
-    operatorColor: Color(0xFF00FF41),
-    functionColor: Color(0xFF1976D2),
-    memoryColor: Color(0xFFFFD166),
-    utilityColor: Color(0xFF121212),
-    numberTextColor: Colors.white,
-    operatorTextColor: Color(0xFF00FF41),
-    functionTextColor: Color(0xFF121212),
-    memoryTextColor: Color(0xFF03DAC6),
-    utilityTextColor: Colors.white,
-    displayBackground: const Color(0xFF1E1E1E),
-    historyBackground: const Color(0xFF121212),
-  ),
-  // 7. Pastel Candy
-  CalculatorThemeMode.pastelCandy: CalculatorTheme(
-    themeData: ThemeData(
-      brightness: Brightness.light,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: Color(0xFFFDFFB6),
-        brightness: Brightness.light,
-      ),
-      scaffoldBackgroundColor: Color(0xFFCAFFBF),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFFFFADAD),
-        foregroundColor: Color(0xFFFDFFB6),
-        elevation: 0,
-      ),
-    ),
-    numberColor: Colors.white,
-    operatorColor: Color(0xFFFFADAD),
-    functionColor: Color(0xFF1976D2),
-    memoryColor: Color(0xFFFFD166),
-    utilityColor: Color(0xFFFDFFB6),
-    numberTextColor: Color(0xFF222831),
-    operatorTextColor: Color(0xFF222831),
-    functionTextColor: Color(0xFF222831),
-    memoryTextColor: Color(0xFF222831),
-    utilityTextColor: Color(0xFF222831),
-    displayBackground: const Color(0xFFFFD6A5),
-    historyBackground: const Color(0xFFCAFFBF),
-  ),
-};
+class CalculatorThemes {
+  static const classicLight = CalculatorTheme(
+    name: 'Classic Light',
+    background: Color(0xFFF0F0F0),
+    displayBackground: Color(0xFFE3F2FD),
+    functionButton: Color(0xFFE0E0E0),
+    operatorButton: Color(0xFFBDBDBD),
+    controlButton: Color(0xFFD32F2F),
+    shiftButton: Color(0xFFF9A825),
+    alphaButton: Color(0xFFE91E63),
+    shiftLabelText: Color(0xFFD39823),
+    alphaLabelText: Color(0xFFC0392B),
+    brightness: Brightness.light,
+  );
+  static const carbonDark = CalculatorTheme(
+    name: 'Carbon Dark',
+    background: Color(0xFF121212),
+    displayBackground: Color(0xFF1E1E1E),
+    functionButton: Color(0xFF2A2A2A),
+    operatorButton: Color(0xFF303841),
+    controlButton: Color(0xFFB71C1C),
+    shiftButton: Color(0xFF00ACC1),
+    alphaButton: Color(0xFFFFB300),
+    shiftLabelText: Color(0xFF26C6DA),
+    alphaLabelText: Color(0xFFFFD54F),
+    brightness: Brightness.dark,
+  );
+  static const oceanBlue = CalculatorTheme(
+    name: 'Ocean Blue',
+    background: Color(0xFF0D1B2A),
+    displayBackground: Color(0xFF1B263B),
+    functionButton: Color(0xFF415A77),
+    operatorButton: Color(0xFF778DA9),
+    controlButton: Color(0xFFB23A48),
+    shiftButton: Color(0xFF1E6091),
+    alphaButton: Color(0xFF184E77),
+    shiftLabelText: Color(0xFF89C2D9),
+    alphaLabelText: Color(0xFFFFD60A),
+    brightness: Brightness.dark,
+  );
+  static const sunsetOrange = CalculatorTheme(
+    name: 'Sunset Orange',
+    background: Color(0xFF2F1B12),
+    displayBackground: Color(0xFF493123),
+    functionButton: Color(0xFF8C4A2F),
+    operatorButton: Color(0xFFAD5D3D),
+    controlButton: Color(0xFFD1495B),
+    shiftButton: Color(0xFFF7B267),
+    alphaButton: Color(0xFFF4845F),
+    shiftLabelText: Color(0xFFFFC857),
+    alphaLabelText: Color(0xFFFFA552),
+    brightness: Brightness.dark,
+  );
+
+  static const all = [classicLight, carbonDark, oceanBlue, sunsetOrange];
+}
+
+// Backwards compatibility aliases for existing code referencing AppColors
+class AppColors {
+  static Color get background => CalculatorThemes.all.first.background;
+  static Color get displayBackground =>
+      CalculatorThemes.all.first.displayBackground;
+  static Color get functionButton => CalculatorThemes.all.first.functionButton;
+  static Color get operatorButton => CalculatorThemes.all.first.operatorButton;
+  static Color get controlButton => CalculatorThemes.all.first.controlButton;
+  static Color get shiftButton => CalculatorThemes.all.first.shiftButton;
+  static Color get alphaButton => CalculatorThemes.all.first.alphaButton;
+  static Color get shiftLabelText => CalculatorThemes.all.first.shiftLabelText;
+  static Color get alphaLabelText => CalculatorThemes.all.first.alphaLabelText;
+}

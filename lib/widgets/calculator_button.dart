@@ -1,116 +1,89 @@
+// lib/widgets/calculator_button.dart
+
 import 'package:flutter/material.dart';
-import '../app/app_state.dart';
-import '../app/theme.dart';
 
 class CalculatorButton extends StatelessWidget {
-  final String label;
-  final String? secondaryLabel;
-  final String? tertiaryLabel;
-  final void Function(ShiftState shiftState) onTap;
-  final ButtonType type;
-  final CalculatorTheme theme;
-  final bool isShift;
-  final ShiftState shiftState;
-
   const CalculatorButton({
     super.key,
-    required this.label,
-    required this.onTap,
-    required this.type,
-    required this.theme,
-    this.secondaryLabel,
-    this.tertiaryLabel,
-    this.isShift = false,
-    this.shiftState = ShiftState.inactive,
+    required this.primaryLabel,
+    this.shiftLabel,
+    this.alphaLabel,
+    this.buttonColor,
+    this.primaryLabelColor,
+    required this.onPressed,
   });
+
+  final String primaryLabel;
+  final String? shiftLabel;
+  final String? alphaLabel;
+  final Color? buttonColor;
+  final Color? primaryLabelColor;
+  final VoidCallback onPressed;
+
+  // Define colors for the secondary labels, matching the target image
+  static const Color shiftTextColor = Color(0xFFD39823);
+  static const Color alphaTextColor = Color(0xFFC0392B);
 
   @override
   Widget build(BuildContext context) {
-    Color backgroundColor;
-    Color textColor;
-
-    switch (type) {
-      case ButtonType.number:
-        backgroundColor = theme.numberButtonColor;
-        textColor = theme.numberTextColor;
-        break;
-      case ButtonType.operator:
-        backgroundColor = theme.operatorButtonColor;
-        textColor = theme.operatorTextColor;
-        break;
-      case ButtonType.function:
-        backgroundColor = theme.functionButtonColor;
-        textColor = theme.functionTextColor;
-        break;
-      case ButtonType.utility:
-        backgroundColor = isShift ? Colors.amber : theme.utilityButtonColor;
-        textColor = isShift ? Colors.black : theme.utilityTextColor;
-        break;
-      case ButtonType.memory:
-        backgroundColor = theme.memoryButtonColor;
-        textColor = theme.memoryTextColor;
-        break;
-    }
-
-    final shiftColor = Colors.amber;
-    final alphaColor = Colors.redAccent;
-
     return Padding(
-      padding: const EdgeInsets.all(2.0),
+      // Add padding for spacing between buttons
+      padding: const EdgeInsets.symmetric(horizontal: 4.0),
       child: ElevatedButton(
-        onPressed: () => onTap(shiftState),
+        onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          elevation: 0,
-          padding: EdgeInsets.zero,
+          backgroundColor:
+              buttonColor ?? Theme.of(context).colorScheme.secondaryContainer,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
         ),
-        child: SizedBox.expand(
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              // Main label (center)
-              Text(
-                label,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // Main label in the center
+            Center(
+              child: Text(
+                primaryLabel,
                 style: TextStyle(
-                  color: textColor,
-                  fontSize: 24,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
+                  color:
+                      primaryLabelColor ??
+                      Theme.of(context).colorScheme.onSecondaryContainer,
                 ),
-                textAlign: TextAlign.center,
               ),
-              // Secondary (SHIFT) label - top left
-              if (secondaryLabel != null)
-                Positioned(
-                  top: 8,
-                  left: 8,
-                  child: Text(
-                    secondaryLabel!,
-                    style: TextStyle(
-                      color: shiftColor,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
+            ),
+
+            // SHIFT label (top left)
+            if (shiftLabel != null)
+              Positioned(
+                top: 0,
+                left: 0,
+                child: Text(
+                  shiftLabel!,
+                  style: const TextStyle(
+                    fontSize: 10,
+                    color: shiftTextColor,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              // Tertiary (ALPHA) label - top right
-              if (tertiaryLabel != null)
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: Text(
-                    tertiaryLabel!,
-                    style: TextStyle(
-                      color: alphaColor,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
+              ),
+
+            // ALPHA label (top right)
+            if (alphaLabel != null)
+              Positioned(
+                top: 0,
+                right: 0,
+                child: Text(
+                  alphaLabel!,
+                  style: const TextStyle(
+                    fontSize: 10,
+                    color: alphaTextColor,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-            ],
-          ),
+              ),
+          ],
         ),
       ),
     );

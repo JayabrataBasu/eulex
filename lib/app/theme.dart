@@ -82,8 +82,83 @@ class CalculatorThemes {
     alphaLabelText: Color(0xFFFFA552),
     brightness: Brightness.dark,
   );
+  static const forestGreen = CalculatorTheme(
+    name: 'Forest Green',
+    background: Color(0xFF0B3D2E),
+    displayBackground: Color(0xFF14532D),
+    functionButton: Color(0xFF1B5E20),
+    operatorButton: Color(0xFF2E7D32),
+    controlButton: Color(0xFFB71C1C),
+    shiftButton: Color(0xFF81C784),
+    alphaButton: Color(0xFF4CAF50),
+    shiftLabelText: Color(0xFFA5D6A7),
+    alphaLabelText: Color(0xFF66BB6A),
+    brightness: Brightness.dark,
+  );
+  static const sakuraBlossom = CalculatorTheme(
+    name: 'Sakura Blossom',
+    background: Color(0xFFFFF0F6),
+    displayBackground: Color(0xFFFFE4EC),
+    functionButton: Color(0xFFF8BBD0),
+    operatorButton: Color(0xFFF48FB1),
+    controlButton: Color(0xFFD32F2F),
+    shiftButton: Color(0xFFEC407A),
+    alphaButton: Color(0xFFF06292),
+    shiftLabelText: Color(0xFFE91E63),
+    alphaLabelText: Color(0xFFC2185B),
+    brightness: Brightness.light,
+  );
+  static const neonCyber = CalculatorTheme(
+    name: 'Neon Cyber',
+    background: Color(0xFF0A0F1E),
+    displayBackground: Color(0xFF11172B),
+    functionButton: Color(0xFF00FF95),
+    operatorButton: Color(0xFF00BFFF),
+    controlButton: Color(0xFFFF0054),
+    shiftButton: Color(0xFF8A2BE2),
+    alphaButton: Color(0xFFFFD300),
+    shiftLabelText: Color(0xFF40E0D0),
+    alphaLabelText: Color(0xFFFFA500),
+    brightness: Brightness.dark,
+  );
+  static const desertSand = CalculatorTheme(
+    name: 'Desert Sand',
+    background: Color(0xFFF4E1C1),
+    displayBackground: Color(0xFFECCB8B),
+    functionButton: Color(0xFFD9A566),
+    operatorButton: Color(0xFFBF8040),
+    controlButton: Color(0xFF8C3C1C),
+    shiftButton: Color(0xFFFFB74D),
+    alphaButton: Color(0xFFF57C00),
+    shiftLabelText: Color(0xFFD17A22),
+    alphaLabelText: Color(0xFFB85C00),
+    brightness: Brightness.light,
+  );
+  static const auroraBorealis = CalculatorTheme(
+    name: 'Aurora Borealis',
+    background: Color(0xFF001219),
+    displayBackground: Color(0xFF003049),
+    functionButton: Color(0xFF006466),
+    operatorButton: Color(0xFF1B3A4B),
+    controlButton: Color(0xFFD62828),
+    shiftButton: Color(0xFF5A189A),
+    alphaButton: Color(0xFF06D6A0),
+    shiftLabelText: Color(0xFF90E0EF),
+    alphaLabelText: Color(0xFFC77DFF),
+    brightness: Brightness.dark,
+  );
 
-  static const all = [classicLight, carbonDark, oceanBlue, sunsetOrange];
+  static const all = [
+    classicLight,
+    carbonDark,
+    oceanBlue,
+    sunsetOrange,
+    auroraBorealis,
+    sakuraBlossom,
+    neonCyber,
+    desertSand,
+    forestGreen,
+  ];
 }
 
 // Backwards compatibility aliases for existing code referencing AppColors

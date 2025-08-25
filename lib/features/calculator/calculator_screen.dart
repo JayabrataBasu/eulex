@@ -118,9 +118,17 @@ class CalculatorScreen extends StatelessWidget {
                       const Spacer(),
                       Align(
                         alignment: Alignment.bottomRight,
-                        child: Text(
-                          calculatorState.input,
+                        child: TextField(
+                          controller: calculatorState.controller,
+                          textAlign: TextAlign.right,
                           style: const TextStyle(fontSize: 48),
+                          maxLines: 1,
+                          decoration: const InputDecoration.collapsed(
+                            hintText: '',
+                          ),
+                          showCursor: true,
+                          autofocus: false,
+                          readOnly: true, // Input only via buttons
                         ),
                       ),
                     ],
@@ -158,12 +166,12 @@ class CalculatorScreen extends StatelessWidget {
                       CalculatorButton(
                         primaryLabel: '◀',
                         buttonColor: theme.operatorButton,
-                        onPressed: () {},
+                        onPressed: () => calculatorState.moveCursor(-1),
                       ),
                       CalculatorButton(
                         primaryLabel: '▶',
                         buttonColor: theme.operatorButton,
-                        onPressed: () {},
+                        onPressed: () => calculatorState.moveCursor(1),
                       ),
                       CalculatorButton(
                         primaryLabel: 'MODE',

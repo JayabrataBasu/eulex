@@ -364,6 +364,10 @@ class CalculatorEngine {
       print("-----------");
       print("STAGE 1: RAW INPUT -> '$input'");
 
+      // Detect calculus patterns before generic preparation since they have nested commas etc.
+      final calcResult = _tryCalculus(input, angleMode, variables);
+      if (calcResult != null) return calcResult;
+
       String expr = _prepareExpression(input);
       print("STAGE 2: AFTER PREPARE -> '$expr'");
 
@@ -401,6 +405,135 @@ class CalculatorEngine {
       print("CAUGHT PARSER ERROR: $e");
       return 'Error';
     }
+  }
+
+  // Attempt to detect and evaluate derivative or integral patterns.
+  // Formats expected (case-insensitive):
+  // d/dx(f(x),x,point)
+  // ∫(f(x),x,a,b)
+  String? _tryCalculus(String raw, AngleMode mode, Map<String, double> vars) {
+    final s = raw.replaceAll(RegExp(r'\s+'), '').toLowerCase();
+    // Derivative pattern d/dx(
+    if (s.startsWith('d/dx(') && s.endsWith(')')) {
+      final inner = s.substring(5, s.length - 1); // content inside d/dx(...)
+      final args = _splitTopLevelArgs(inner);
+      if (args.length == 3) {
+        final expr = args[0];
+        final variable = args[1];
+        final pointStr = args[2];
+        final point = double.tryParse(
+          _evaluateCore(pointStr, mode, vars, skipRuntime: true),
+        );
+        if (point == null) return 'Error';
+        final val = _numericalDerivative(expr, variable, point, mode, vars);
+        return _formatNumber(val);
+      }
+      return 'Error';
+    }
+    // Integral pattern ∫(expr,var,a,b)
+    if ((s.startsWith('∫(') || s.startsWith('int(')) && s.endsWith(')')) {
+      final startIdx = s.indexOf('(');
+      final inner = s.substring(startIdx + 1, s.length - 1);
+      final args = _splitTopLevelArgs(inner);
+      if (args.length == 4) {
+        final expr = args[0];
+        final variable = args[1];
+        final aStr = args[2];
+        final bStr = args[3];
+        final a = double.tryParse(
+          _evaluateCore(aStr, mode, vars, skipRuntime: true),
+        );
+        final b = double.tryParse(
+          _evaluateCore(bStr, mode, vars, skipRuntime: true),
+        );
+        if (a == null || b == null) return 'Error';
+        final val = _numericalIntegral(expr, variable, a, b, mode, vars);
+        return _formatNumber(val);
+      }
+      return 'Error';
+    }
+    return null;
+  }
+
+  List<String> _splitTopLevelArgs(String content) {
+    final args = <String>[];
+    int depth = 0;
+    int last = 0;
+    for (int i = 0; i < content.length; i++) {
+      final c = content[i];
+      if (c == '(')
+        depth++;
+      else if (c == ')')
+        depth--;
+      else if (c == ',' && depth == 0) {
+        args.add(content.substring(last, i));
+        last = i + 1;
+      }
+    }
+    args.add(content.substring(last));
+    return args.map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+  }
+
+  double _numericalDerivative(
+    String expr,
+    String variable,
+    double x0,
+    AngleMode mode,
+    Map<String, double> vars,
+  ) {
+    // Symmetric difference quotient with adaptive small h
+    const double h = 1e-5; // fixed small step
+    final v1 = _evalExprWithVar(expr, variable, x0 + h, mode, vars);
+    final v2 = _evalExprWithVar(expr, variable, x0 - h, mode, vars);
+    return (v1 - v2) / (2 * h);
+  }
+
+  double _numericalIntegral(
+    String expr,
+    String variable,
+    double a,
+    double b,
+    AngleMode mode,
+    Map<String, double> vars,
+  ) {
+    // Simpson's rule with even n
+    int n = 1000;
+    if (n % 2 == 1) n++;
+    final h = (b - a) / n;
+    double sum = 0.0;
+    for (int i = 0; i <= n; i++) {
+      final x = a + i * h;
+      final fx = _evalExprWithVar(expr, variable, x, mode, vars);
+      if (i == 0 || i == n)
+        sum += fx;
+      else if (i % 2 == 1)
+        sum += 4 * fx;
+      else
+        sum += 2 * fx;
+    }
+    return sum * h / 3.0;
+  }
+
+  double _evalExprWithVar(
+    String expr,
+    String variable,
+    double value,
+    AngleMode mode,
+    Map<String, double> vars,
+  ) {
+    final local = Map<String, double>.from(vars);
+    local[variable] = value;
+    final prepared = _prepareExpression(expr);
+    final exprAngle = _applyAngleMode(prepared, mode);
+    // Skip runtime gcd/lcm to avoid heavy recursion here
+    final result = _evaluateCore(exprAngle, mode, local, skipRuntime: true);
+    return double.tryParse(result) ?? double.nan;
+  }
+
+  String _formatNumber(double v) {
+    if (v.isNaN || v.isInfinite) return 'Error';
+    final s = v.toStringAsFixed(10);
+    return _trimTrailingZeros(s);
   }
 
   String _trimTrailingZeros(String s) {
